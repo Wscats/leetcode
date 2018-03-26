@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+
+	<body>
+		<script>
+			var addTwoNumbers = function(l1, l2) {
+				var arr = [];
+				(l1 || l2) && f(arr, l1, l2, 0);
+				return arr;
+			};
+			//利用递归
+			function f(arr, l1, l2, n) {
+				console.log("arr", arr)
+				if(!l1 && !l2) {
+					n && arr.push(n);
+					return;
+				}
+				var sum = (l1 ? l1.val : 0) + (l2 ? l2.val : 0) + n;
+				var m = ~~(sum / 10); // OR (sum / 10) >> 0 OR (sum / 10) | 0
+				arr.push(sum % 10);
+				f(arr, l1 && l1.next, l2 && l2.next, m);
+			}
+			var l1 = {
+				val: 2,
+				next: {
+					val: 4,
+					next: {
+						val: 3,
+						next: null
+					}
+				}
+			};
+
+			var l2 = {
+				val: 5,
+				next: {
+					val: 6,
+					next: {
+						val: 4,
+						next: null
+					}
+				}
+			};
+
+			var result = addTwoNumbers(l1, l2);
+			console.log(result)
+		</script>
+	</body>
+
+</html>
