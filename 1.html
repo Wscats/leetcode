@@ -1,35 +1,37 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="UTF-8">
-		<title></title>
-	</head>
-	<body>
-		<script>
-			var twoSum = function(nums, target) {
-				const hash = {};
-				for(let n, i = 0, l = nums.length; i < l; ++i) {
-					n = nums[i];
-					console.log("n:", n)
-					console.log("i:", i)
-					console.log("hash:", hash)
-					//当遇到差值之后，把当前位置和记录差值的位置返回
-					if(hash[n] >= 0) {
-						return [hash[n], i]
-					}
-					//26-2 = 0  24:0
-					//26-7 = 1  19:1
-					//26-11= 2  15:2
-					//26-15= 3  11:3
-					//把目标值和当前值计算差值记录，并记录位置
-					hash[target - n] = i
+
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+</head>
+
+<body>
+	<script>
+		var twoSum = function (nums, target) {
+			const hash = {};
+			for (let n, i = 0, l = nums.length; i < l; ++i) {
+				n = nums[i];
+				console.log("n:", n)
+				console.log("i:", i)
+				console.log("hash:", hash)
+				//当遇到差值之后，把当前位置和记录差值的位置返回
+				if (hash[n] >= 0) {
+					return [hash[n], i]
 				}
-			};
-			//             [24,19,15, 11]
-			var testCase = [2, 7, 11, 15];
-			var result = twoSum(testCase, 26);
-			console.log(result);
-		</script>
-	</body>
+				//26-2 = 0  24:0
+				//26-7 = 1  19:1
+				//26-11= 2  15:2
+				//26-15= 3  11:3
+				//把目标值和当前值计算差值记录，并记录位置
+				hash[target - n] = i
+			}
+		};
+		// [24,19,15, 11]
+		var testCase = [2, 7, 11, 15];
+		var result = twoSum(testCase, 26);
+		console.log(result);
+	</script>
+</body>
 
 </html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        /**
+         * @param {string} s
+         * @return {string}
+         */
+        // The following code should be optimized.
+        var longestPalindrome = function (s) {
+            var tmp, index, max = '';
+            // 从字符串第二个字符开始对比
+            for (var i = 1, l = s.length; i < l; ++i) {
+                // 处理aba,cbc这种对称的情况
+                if (s[i + 1] === s[i - 1]) {
+                    tmp = s[i - 1] + s[i] + s[i + 1];
+                    index = 2;
+                    // 如果找到aba，继续寻找xabax是否是继续对称
+                    while ((i - index >= 0) && (i + index < l)) {
+                        if (s[i - index] === s[i + index]) {
+                            tmp = s[i - index] + tmp + s[i + index];
+                        } else {
+                            break;
+                        }
+                        ++index;
+                    }
+
+                    (max.length < tmp.length) && (max = tmp);
+                }
+                // 处理aa,bb这种对称的情况
+                if (s[i] === s[i - 1]) {
+                    tmp = s[i - 1] + s[i];
+                    index = 2;
+                    while ((i - index >= 0) && ((i + index - 1) < l)) {
+                        if (s[i - index] === s[i + index - 1]) {
+                            tmp = s[i - index] + tmp + s[i + index - 1];
+                        } else {
+                            break;
+                        }
+                        ++index;
+                    }
+                    (max.length < tmp.length) && (max = tmp);
+                }
+            }
+
+            return max || s;
+        };
+        var testCase = 'abcbadddd';
+        console.log(longestPalindrome(testCase) === 'abcba'); // true
+    </script>
+</body>
+
+</html>

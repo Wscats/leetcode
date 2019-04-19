@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        /**
+         * @param {string} s
+         * @return {number}
+         */
+
+        // 这里的思路就是用一个对象记录每一个字母出现的次数
+        // abcabcbb->
+        // map = {
+        //     a: 2,
+        //     b: 4,
+        //     c: 2
+        // }
+        // bbbbb->
+        // map = {
+        //     b: 5
+        // }
+        var lengthOfLongestSubstring = function (s) {
+            var max = 0;
+            var last = -1;
+            var map = {};
+            for (var i = 0, l = s.length; i < l; ++i) {
+                if (map[s[i]] >= 0 && last < map[s[i]]) {
+                    last = map[s[i]];
+                }
+                if (i - last > max) {
+                    max = i - last;
+                }
+                map[s[i]] = i;
+            }
+            return max;
+        };
+
+        var testCase1 = 'abcabcbb';
+        var testCase2 = 'bbbbb';
+        console.log(lengthOfLongestSubstring(testCase1));
+        console.log(lengthOfLongestSubstring(testCase1) === 3); // true
+        console.log(lengthOfLongestSubstring(testCase2));
+        console.log(lengthOfLongestSubstring(testCase2) === 1); // true
+    </script>
+</body>
+
+</html>

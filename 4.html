@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        /**
+         * @param {number[]} nums1
+         * @param {number[]} nums2
+         * @return {number}
+         */
+        var findMedianSortedArrays = function (nums1, nums2) {
+            // Merge nums2 into nums1
+            for (
+                // 插入num1数组的位置
+                var n1Index = 0,
+                    n2Index = 0,
+                    // 数组2的长度
+                    l = nums2.length;
+                // 遍历数组2
+                n2Index < l;
+                ++n2Index
+            ) {
+                // 这里的原理就是每一次数组2都拿一项和数组1的最大的比，只要数组2的元素大于数组1取出来的元素n1Index下标值加1
+                while (nums2[n2Index] > nums1[n1Index]) {
+                    n1Index++;
+                }
+                // 在n1Index位插入第nums2[n2Index]数字到nums1数组里面
+                nums1.splice(n1Index, 0, nums2[n2Index]);
+            }
+
+            var n = nums1.length / 2;
+            console.log(n); // 算出数组是偶数还是奇数
+            console.log((nums1[n] + nums1[n - 1]) / 2); // 取中间两边的数，然后除以2
+            console.log(nums1[n - 0.5]);
+            return (nums1.length % 2 === 0) ? (nums1[n] + nums1[n - 1]) / 2 : nums1[n - 0.5];
+        };
+
+        console.log(findMedianSortedArrays([1, 2, 3, 6],[5, 8])); // true
+    </script>
+</body>
+
+</html>
