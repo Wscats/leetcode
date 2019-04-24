@@ -11,24 +11,58 @@
 <body>
     <script>
         /**
-         * @param {number} x
-         * @return {number}
+         * @param {string} s
+         * @param {number} numRows
+         * @return {string}
          */
-        var reverse = function (x) {
-            let result = 0
-            while (x) {
-                // 求余拿最后一位
-                result = result * 10 + x % 10
-                x = ~~(x / 10)
+        // Solution 1:
+        // Runtime: 196 ms
+        var convert = function (s, numRows) {
+            if (numRows === 1 || numRows > s.length) {
+                return s;
             }
-            if (result > 2147483648 || result < -2147483649) result = 0
-            return result
+            var arr = [];
+            for (
+                var step,
+                    // 字符串的长度索引值
+                    i = 0,
+                    // 字符串的长度
+                    l = s.length,
+                    // 数组的列数索引值
+                    row = 0,
+                    // 数组的列数
+                    n = numRows - 1;
+                // 根据字符串的长度遍历
+                i < l; ++i
+            ) {
+                if (row === n) {
+                    step = -1;
+                } else if (row === 0) {
+                    step = 1;
+                }
+                // 把数组当前字符串叠加
+                arr[row] = (arr[row] || '') + s[i];
+                row += step;
+            }
+
+            return arr.join('');
         };
 
-        // Test cases
-        console.log(reverse(1563847412) === 0); // true
-        console.log(reverse(-2147483648) === 0); // true
-        console.log(reverse(32768) === 86723); // true
+        // "PAYPALISHIRING"
+        // ->
+        // P   A   H   N
+        // A P L S I I G
+        // Y   I   R
+        // ->
+        // [P, A, Y]
+        // [P, AP, Y]
+        // [PA, APL, YI]
+        // [PA, APLS, YI]
+        // [PAH, APLSI, YIR]
+        // [PAH, APLSI, YIR]
+        // [PAHN, APLSIG, YIR]
+
+        console.log(convert('PAYPALISHIRING', 3) === 'PAHNAPLSIIGYIR'); // true
     </script>
 </body>
 

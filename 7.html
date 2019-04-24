@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        /**
+         * @param {number} x
+         * @return {number}
+         */
+        var reverse = function (x) {
+            // 
+            let result = 0
+            while (x) {
+                // 求余拿最后一位
+                result = result * 10 + x % 10
+                // 取整数，把余数去掉
+                x = ~~(x / 10)
+            }
+            if (result > 2147483648 || result < -2147483649) result = 0
+            return result
+        };
+        // 1563847412 -> 
+        // 156384741  -> 2 
+        // 15638474   -> 21 
+        // 1563847    -> 214
+        // ... 
+
+        // Test cases
+        console.log(reverse(1563847412) === 0); // true
+        console.log(reverse(-2147483648) === 0); // true
+        console.log(reverse(32768) === 86723); // true
+    </script>
+</body>
+
+</html>
