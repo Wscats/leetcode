@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>字符串的最大公因子 - 交互式图解</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: linear-gradient(135deg, #0a0a2e, #1a1a4e, #0d0d3a);
+      min-height: 100vh;
+      color: #fff;
+      padding: 30px 20px;
+    }
+
+    .container { max-width: 960px; margin: 0 auto; }
+
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 6px;
+      background: linear-gradient(90deg, #00f2fe, #4facfe, #f093fb);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #999;
+      margin-bottom: 28px;
+      font-size: 0.92rem;
+    }
+
+    /* === 题目描述 === */
+    .problem-section {
+      background: rgba(255,255,255,0.05);
+      border-radius: 14px;
+      padding: 22px 26px;
+      margin-bottom: 24px;
+      border: 1px solid rgba(255,255,255,0.08);
+      line-height: 1.8;
+      font-size: 0.93rem;
+      color: #ccc;
+    }
+
+    .problem-section strong { color: #4facfe; }
+    .problem-section code {
+      background: rgba(79,172,254,0.15);
+      padding: 2px 7px;
+      border-radius: 4px;
+      color: #4facfe;
+      font-size: 0.88rem;
+    }
+
+    /* === 输入区 === */
+    .input-section {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .input-group label {
+      font-size: 0.82rem;
+      color: #aaa;
+      font-weight: 600;
+    }
+
+    .input-group input {
+      padding: 10px 14px;
+      border: 2px solid rgba(255,255,255,0.12);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.07);
+      color: #fff;
+      font-size: 1.05rem;
+      width: 240px;
+      outline: none;
+      transition: border-color 0.3s;
+      font-family: 'Fira Code', Consolas, monospace;
+    }
+
+    .input-group input:focus { border-color: #4facfe; }
+
+    .btn {
+      padding: 10px 24px;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn:hover { transform: translateY(-2px); }
+
+    .btn-run {
+      background: linear-gradient(135deg, #4facfe, #00f2fe);
+      color: #000;
+    }
+
+    .btn-run:hover { box-shadow: 0 6px 20px rgba(79,172,254,0.4); }
+
+    .btn-step {
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+      color: #fff;
+    }
+
+    .btn-step:hover { box-shadow: 0 6px 20px rgba(245,87,108,0.4); }
+
+    .btn-reset {
+      background: rgba(255,255,255,0.1);
+      color: #ccc;
+    }
+
+    .btn-reset:hover { background: rgba(255,255,255,0.18); }
+
+    .speed-control {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .speed-control label { font-size: 0.82rem; color: #aaa; }
+    .speed-control input[type="range"] { width: 100px; accent-color: #4facfe; }
+
+    /* === 思路卡片 === */
+    .idea-section {
+      background: rgba(0,0,0,0.35);
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 24px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .idea-section h2 {
+      font-size: 1.1rem;
+      margin-bottom: 16px;
+      color: #00f2fe;
+    }
+
+    .idea-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+    }
+
+    .idea-card {
+      background: rgba(255,255,255,0.04);
+      border-radius: 10px;
+      padding: 16px;
+      border-left: 3px solid;
+      transition: all 0.3s;
+    }
+
+    .idea-card:nth-child(1) { border-color: #4facfe; }
+    .idea-card:nth-child(2) { border-color: #f093fb; }
+    .idea-card:nth-child(3) { border-color: #38ef7d; }
+
+    .idea-card h3 {
+      font-size: 0.92rem;
+      margin-bottom: 8px;
+    }
+
+    .idea-card h3:nth-of-type(1) { color: inherit; }
+
+    .idea-card p {
+      font-size: 0.84rem;
+      color: #bbb;
+      line-height: 1.6;
+    }
+
+    .idea-card code {
+      background: rgba(255,255,255,0.08);
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 0.82rem;
+    }
+
+    /* === 代码区 === */
+    .code-section {
+      background: rgba(0,0,0,0.4);
+      border-radius: 14px;
+      padding: 22px;
+      margin-bottom: 24px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .code-section h2 {
+      font-size: 1.1rem;
+      margin-bottom: 14px;
+      color: #4facfe;
+    }
+
+    .code-block {
+      font-family: 'Fira Code', Consolas, monospace;
+      font-size: 0.85rem;
+      line-height: 1.75;
+      overflow-x: auto;
+    }
+
+    .code-line {
+      padding: 2px 10px;
+      border-radius: 4px;
+      transition: background 0.3s;
+      white-space: pre;
+      border-left: 3px solid transparent;
+    }
+
+    .code-line.active {
+      background: rgba(79,172,254,0.18);
+      border-left-color: #4facfe;
+    }
+
+    .keyword { color: #c678dd; }
+    .func { color: #61afef; }
+    .string { color: #98c379; }
+    .comment { color: #5c6370; font-style: italic; }
+    .variable { color: #e5c07b; }
+    .operator { color: #56b6c2; }
+    .number { color: #d19a66; }
+
+    /* === 可视化区 === */
+    .viz-section {
+      background: rgba(0,0,0,0.3);
+      border-radius: 14px;
+      padding: 26px;
+      margin-bottom: 24px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .viz-section h2 {
+      font-size: 1.1rem;
+      margin-bottom: 18px;
+      color: #f093fb;
+    }
+
+    .string-display {
+      margin-bottom: 18px;
+    }
+
+    .string-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+      gap: 10px;
+    }
+
+    .str-label {
+      font-weight: 700;
+      font-size: 0.85rem;
+      width: 55px;
+      flex-shrink: 0;
+      color: #aaa;
+    }
+
+    .char-cells {
+      display: flex;
+      gap: 3px;
+      flex-wrap: wrap;
+    }
+
+    .char-cell {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 700;
+      transition: all 0.35s;
+    }
+
+    .char-cell.str1-cell {
+      background: rgba(79,172,254,0.18);
+      border: 2px solid rgba(79,172,254,0.4);
+      color: #4facfe;
+    }
+
+    .char-cell.str2-cell {
+      background: rgba(240,147,251,0.18);
+      border: 2px solid rgba(240,147,251,0.4);
+      color: #f093fb;
+    }
+
+    .char-cell.match {
+      background: rgba(56,239,125,0.2);
+      border-color: rgba(56,239,125,0.6);
+      color: #38ef7d;
+    }
+
+    .char-cell.mismatch {
+      background: rgba(255,75,75,0.2);
+      border-color: rgba(255,75,75,0.6);
+      color: #ff4b4b;
+    }
+
+    .char-cell.candidate {
+      box-shadow: 0 0 12px rgba(255,215,0,0.5);
+      border-color: #ffd700 !important;
+      transform: scale(1.1);
+    }
+
+    .char-cell.gcd-result {
+      background: rgba(56,239,125,0.3);
+      border-color: #38ef7d;
+      color: #38ef7d;
+      animation: glow 1.2s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+      from { box-shadow: 0 0 5px rgba(56,239,125,0.3); }
+      to { box-shadow: 0 0 18px rgba(56,239,125,0.7); }
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0); opacity: 0; }
+      60% { transform: scale(1.15); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* 候选段展示 */
+    .candidate-section {
+      margin-top: 20px;
+      padding: 18px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 10px;
+      min-height: 90px;
+    }
+
+    .candidate-title {
+      font-size: 0.88rem;
+      color: #aaa;
+      margin-bottom: 10px;
+    }
+
+    .candidate-display {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .candidate-tag {
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .candidate-tag.testing {
+      background: rgba(255,215,0,0.15);
+      border: 1.5px solid rgba(255,215,0,0.4);
+      color: #ffd700;
+    }
+
+    .candidate-tag.pass {
+      background: rgba(56,239,125,0.15);
+      border: 1.5px solid rgba(56,239,125,0.4);
+      color: #38ef7d;
+    }
+
+    .candidate-tag.fail {
+      background: rgba(255,75,75,0.12);
+      border: 1.5px solid rgba(255,75,75,0.3);
+      color: #ff4b4b;
+      text-decoration: line-through;
+    }
+
+    /* 验证过程展示 */
+    .verify-section {
+      margin-top: 16px;
+      padding: 16px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 10px;
+    }
+
+    .verify-title {
+      font-size: 0.85rem;
+      color: #aaa;
+      margin-bottom: 10px;
+    }
+
+    .verify-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      font-size: 0.88rem;
+    }
+
+    .verify-label {
+      color: #888;
+      width: 80px;
+      flex-shrink: 0;
+    }
+
+    .repeat-cells {
+      display: flex;
+      gap: 2px;
+      flex-wrap: wrap;
+    }
+
+    .repeat-cell {
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 5px;
+      font-size: 0.88rem;
+      font-weight: 600;
+    }
+
+    .repeat-cell.group-a {
+      background: rgba(79,172,254,0.15);
+      color: #4facfe;
+      border: 1px solid rgba(79,172,254,0.3);
+    }
+
+    .repeat-cell.group-b {
+      background: rgba(240,147,251,0.15);
+      color: #f093fb;
+      border: 1px solid rgba(240,147,251,0.3);
+    }
+
+    .verify-result {
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+    }
+
+    .verify-result.ok {
+      background: rgba(56,239,125,0.15);
+      color: #38ef7d;
+    }
+
+    .verify-result.ng {
+      background: rgba(255,75,75,0.12);
+      color: #ff4b4b;
+    }
+
+    /* 步骤信息 */
+    .step-info {
+      margin-top: 18px;
+      padding: 14px 18px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 10px;
+      font-size: 0.9rem;
+      color: #ddd;
+      line-height: 1.7;
+      min-height: 48px;
+    }
+
+    .hl-blue { color: #4facfe; font-weight: 600; }
+    .hl-pink { color: #f093fb; font-weight: 600; }
+    .hl-green { color: #38ef7d; font-weight: 600; }
+    .hl-yellow { color: #ffd700; font-weight: 600; }
+    .hl-red { color: #ff4b4b; font-weight: 600; }
+
+    /* 结果展示 */
+    .result-section {
+      margin-top: 18px;
+      padding: 16px 20px;
+      background: rgba(56,239,125,0.08);
+      border-radius: 10px;
+      border: 1px solid rgba(56,239,125,0.2);
+      display: none;
+    }
+
+    .result-section.show { display: block; }
+
+    .result-section .result-label {
+      font-size: 0.85rem;
+      color: #38ef7d;
+      margin-bottom: 8px;
+    }
+
+    .result-section .result-value {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #38ef7d;
+      font-family: 'Fira Code', Consolas, monospace;
+    }
+
+    /* === 流程图 === */
+    .flow-section {
+      background: rgba(0,0,0,0.3);
+      border-radius: 14px;
+      padding: 26px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .flow-section h2 {
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+      color: #00f2fe;
+    }
+
+    .flowchart {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    .flow-node {
+      padding: 12px 22px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-align: center;
+      max-width: 360px;
+      transition: all 0.3s;
+    }
+
+    .flow-node.start {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 28px;
+    }
+
+    .flow-node.process {
+      background: rgba(79,172,254,0.15);
+      border: 2px solid rgba(79,172,254,0.35);
+    }
+
+    .flow-node.decision {
+      background: rgba(245,87,108,0.15);
+      border: 2px solid rgba(245,87,108,0.35);
+      border-radius: 12px;
+    }
+
+    .flow-node.end-ok {
+      background: linear-gradient(135deg, #11998e, #38ef7d);
+      border-radius: 28px;
+      color: #000;
+    }
+
+    .flow-node.end-fail {
+      background: linear-gradient(135deg, #eb3349, #f45c43);
+      border-radius: 28px;
+    }
+
+    .flow-node.active-flow {
+      box-shadow: 0 0 22px rgba(255,215,0,0.5);
+      border-color: #ffd700 !important;
+    }
+
+    .flow-arrow {
+      width: 2px;
+      height: 24px;
+      background: rgba(255,255,255,0.25);
+      position: relative;
+    }
+
+    .flow-arrow::after {
+      content: '▼';
+      position: absolute;
+      bottom: -9px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.65rem;
+      color: rgba(255,255,255,0.35);
+    }
+
+    .flow-arrow-label {
+      font-size: 0.75rem;
+      color: #888;
+      margin: 2px 0;
+    }
+
+    .flow-branch {
+      display: flex;
+      gap: 50px;
+      justify-content: center;
+    }
+
+    .flow-branch-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .flow-branch-label {
+      font-size: 0.78rem;
+      color: #999;
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    /* === 示例区 === */
+    .examples {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .example-btn {
+      padding: 6px 14px;
+      border: 1.5px solid rgba(255,255,255,0.12);
+      border-radius: 8px;
+      background: rgba(255,255,255,0.05);
+      color: #bbb;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .example-btn:hover {
+      border-color: #4facfe;
+      color: #4facfe;
+      background: rgba(79,172,254,0.08);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧬 字符串的最大公因子</h1>
+    <p class="subtitle">LeetCode 1071 · Greatest Common Divisor of Strings</p>
+
+    <!-- 题目描述 -->
+    <div class="problem-section">
+      <strong>题目：</strong>对于字符串 <code>s</code> 和 <code>t</code>，只有在 <code>s = t + t + ... + t</code>（即 <code>t</code> 自身连接1次或多次）时，我们才认定 "<code>t</code> 能除尽 <code>s</code>"。
+      给你两个字符串 <code>str1</code> 和 <code>str2</code>，请你找出最长字符串 <code>x</code>，要求 <code>x</code> 能除尽 <code>str1</code> 且 <code>x</code> 能除尽 <code>str2</code>。
+    </div>
+
+    <!-- 快捷示例 -->
+    <div class="examples">
+      <button class="example-btn" onclick="loadExample('ABCABC','ABC')">示例1: "ABCABC", "ABC"</button>
+      <button class="example-btn" onclick="loadExample('ABABAB','ABAB')">示例2: "ABABAB", "ABAB"</button>
+      <button class="example-btn" onclick="loadExample('LEET','CODE')">示例3: "LEET", "CODE"</button>
+      <button class="example-btn" onclick="loadExample('ABCDEF','ABC')">示例4: "ABCDEF", "ABC"</button>
+    </div>
+
+    <!-- 输入区 -->
+    <div class="input-section">
+      <div class="input-group">
+        <label>str1</label>
+        <input type="text" id="str1Input" value="ABCABC" maxlength="20" placeholder="例如 ABCABC">
+      </div>
+      <div class="input-group">
+        <label>str2</label>
+        <input type="text" id="str2Input" value="ABC" maxlength="20" placeholder="例如 ABC">
+      </div>
+      <button class="btn btn-run" onclick="runAuto()">▶ 自动演示</button>
+      <button class="btn btn-step" onclick="stepForward()">⏭ 单步</button>
+      <button class="btn btn-reset" onclick="resetViz()">↺ 重置</button>
+      <div class="speed-control">
+        <label>速度</label>
+        <input type="range" id="speedRange" min="1" max="10" value="5">
+      </div>
+    </div>
+
+    <!-- 核心思路 -->
+    <div class="idea-section">
+      <h2>💡 核心思路</h2>
+      <div class="idea-steps">
+        <div class="idea-card">
+          <h3 style="color:#4facfe;">① 判断是否存在公因子</h3>
+          <p>如果 <code>str1 + str2 ≠ str2 + str1</code>，则不存在公因子，直接返回空串。这是因为两个字符串必须由同一个基础串重复构成。</p>
+        </div>
+        <div class="idea-card">
+          <h3 style="color:#f093fb;">② 利用 GCD 求公因子长度</h3>
+          <p>如果存在公因子，其长度一定是 <code>gcd(len1, len2)</code>。利用辗转相除法求两个长度的最大公约数。</p>
+        </div>
+        <div class="idea-card">
+          <h3 style="color:#38ef7d;">③ 截取并返回结果</h3>
+          <p>最大公因子就是 <code>str1.substring(0, gcdLen)</code>，即 str1 的前 gcdLen 个字符。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 代码区 -->
+    <div class="code-section">
+      <h2>💻 JavaScript 代码</h2>
+      <div class="code-block">
+        <div class="code-line" data-line="0"><span class="keyword">function</span> <span class="func">gcdOfStrings</span>(<span class="variable">str1</span>, <span class="variable">str2</span>) {</div>
+        <div class="code-line" data-line="1">  <span class="comment">// Step 1: check if GCD string exists</span></div>
+        <div class="code-line" data-line="2">  <span class="keyword">if</span> (<span class="variable">str1</span> + <span class="variable">str2</span> <span class="operator">!==</span> <span class="variable">str2</span> + <span class="variable">str1</span>) <span class="keyword">return</span> <span class="string">""</span>;</div>
+        <div class="code-line" data-line="3"></div>
+        <div class="code-line" data-line="4">  <span class="comment">// Step 2: GCD of two lengths using Euclidean algorithm</span></div>
+        <div class="code-line" data-line="5">  <span class="keyword">const</span> <span class="func">gcd</span> = (<span class="variable">a</span>, <span class="variable">b</span>) <span class="operator">=></span> <span class="variable">b</span> <span class="operator">===</span> <span class="number">0</span> ? <span class="variable">a</span> : <span class="func">gcd</span>(<span class="variable">b</span>, <span class="variable">a</span> <span class="operator">%</span> <span class="variable">b</span>);</div>
+        <div class="code-line" data-line="6"></div>
+        <div class="code-line" data-line="7">  <span class="comment">// Step 3: return the GCD string</span></div>
+        <div class="code-line" data-line="8">  <span class="keyword">return</span> <span class="variable">str1</span>.<span class="func">substring</span>(<span class="number">0</span>, <span class="func">gcd</span>(<span class="variable">str1</span>.length, <span class="variable">str2</span>.length));</div>
+        <div class="code-line" data-line="9">}</div>
+      </div>
+    </div>
+
+    <!-- 可视化区 -->
+    <div class="viz-section">
+      <h2>🎨 动画图解</h2>
+
+      <!-- 字符串展示 -->
+      <div class="string-display">
+        <div class="string-row">
+          <div class="str-label" style="color:#4facfe;">str1</div>
+          <div class="char-cells" id="str1Cells"></div>
+        </div>
+        <div class="string-row">
+          <div class="str-label" style="color:#f093fb;">str2</div>
+          <div class="char-cells" id="str2Cells"></div>
+        </div>
+      </div>
+
+      <!-- 拼接验证展示 -->
+      <div class="candidate-section" id="candidateSection">
+        <div class="candidate-title" id="candidateTitle">等待开始...</div>
+        <div class="candidate-display" id="candidateDisplay"></div>
+      </div>
+
+      <!-- 验证过程 -->
+      <div class="verify-section" id="verifySection" style="display:none;">
+        <div class="verify-title" id="verifyTitle"></div>
+        <div id="verifyContent"></div>
+      </div>
+
+      <!-- 结果 -->
+      <div class="result-section" id="resultSection">
+        <div class="result-label">🎉 最大公因子：</div>
+        <div class="result-value" id="resultValue"></div>
+      </div>
+
+      <!-- 步骤信息 -->
+      <div class="step-info" id="stepInfo">
+        点击 <span class="hl-yellow">自动演示</span> 或 <span class="hl-yellow">单步</span> 开始可视化。
+      </div>
+    </div>
+
+    <!-- 流程图 -->
+    <div class="flow-section">
+      <h2>📊 算法流程图</h2>
+      <div class="flowchart">
+        <div class="flow-node start" id="flow-start">开始：输入 str1, str2</div>
+        <div class="flow-arrow"></div>
+        <div class="flow-node decision" id="flow-check">str1 + str2 === str2 + str1 ?</div>
+        <div class="flow-arrow"></div>
+        <div class="flow-branch">
+          <div class="flow-branch-item">
+            <div class="flow-branch-label">❌ 不相等</div>
+            <div class="flow-node end-fail" id="flow-fail">返回 "" (空串)</div>
+          </div>
+          <div class="flow-branch-item">
+            <div class="flow-branch-label">✅ 相等</div>
+            <div class="flow-node process" id="flow-gcd">计算 gcd(str1.length, str2.length)</div>
+          </div>
+        </div>
+        <div class="flow-arrow"></div>
+        <div class="flow-node process" id="flow-substr">截取 str1.substring(0, gcdLen)</div>
+        <div class="flow-arrow"></div>
+        <div class="flow-node end-ok" id="flow-result">返回最大公因子 ✅</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // === Core Algorithm ===
+    function gcdOfStrings(str1, str2) {
+      if (str1 + str2 !== str2 + str1) return "";
+      const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
+      return str1.substring(0, gcd(str1.length, str2.length));
+    }
+
+    function gcd(a, b) {
+      return b === 0 ? a : gcd(b, a % b);
+    }
+
+    // === Visualization State ===
+    let str1 = "", str2 = "";
+    let steps = [];
+    let currentStep = -1;
+    let autoTimer = null;
+    let isPlaying = false;
+
+    function loadExample(s1, s2) {
+      document.getElementById('str1Input').value = s1;
+      document.getElementById('str2Input').value = s2;
+      resetViz();
+    }
+
+    // === Generate Steps ===
+    function generateSteps(s1, s2) {
+      const arr = [];
+
+      // Step: show inputs
+      arr.push({
+        type: 'init',
+        codeLine: 0,
+        flowNode: 'flow-start',
+        info: `输入 <span class="hl-blue">str1 = "${s1}"</span> (长度${s1.length})，<span class="hl-pink">str2 = "${s2}"</span> (长度${s2.length})`
+      });
+
+      // Step: check concatenation
+      const concat1 = s1 + s2;
+      const concat2 = s2 + s1;
+      const isEqual = concat1 === concat2;
+
+      arr.push({
+        type: 'concat-check',
+        concat1, concat2, isEqual,
+        codeLine: 2,
+        flowNode: 'flow-check',
+        info: `验证拼接：<span class="hl-blue">str1+str2</span> = "${concat1}"<br>　　　　　<span class="hl-pink">str2+str1</span> = "${concat2}"<br>两者${isEqual ? '<span class="hl-green">相等 ✅</span> → 存在公因子' : '<span class="hl-red">不相等 ❌</span> → 不存在公因子'}`
+      });
+
+      if (!isEqual) {
+        arr.push({
+          type: 'no-gcd',
+          codeLine: 2,
+          flowNode: 'flow-fail',
+          info: `<span class="hl-red">str1 + str2 ≠ str2 + str1</span>，两个字符串不是由相同基础串构成，返回空串 <span class="hl-red">""</span>`
+        });
+        return arr;
+      }
+
+      // Step: GCD calculation
+      const len1 = s1.length, len2 = s2.length;
+      const gcdSteps = [];
+      let a = len1, b = len2;
+      gcdSteps.push({ a, b });
+      while (b !== 0) {
+        const temp = b;
+        b = a % b;
+        a = temp;
+        gcdSteps.push({ a, b });
+      }
+      const gcdLen = a;
+
+      arr.push({
+        type: 'gcd-calc',
+        gcdSteps,
+        gcdLen,
+        codeLine: 5,
+        flowNode: 'flow-gcd',
+        info: `计算 <span class="hl-yellow">gcd(${len1}, ${len2})</span>：辗转相除 → ${gcdSteps.map(s => `gcd(${s.a}, ${s.b})`).join(' → ')} = <span class="hl-green">${gcdLen}</span>`
+      });
+
+      // Step: Show candidate = str1.substring(0, gcdLen)
+      const candidate = s1.substring(0, gcdLen);
+
+      arr.push({
+        type: 'candidate',
+        candidate,
+        gcdLen,
+        codeLine: 8,
+        flowNode: 'flow-substr',
+        info: `截取 str1 的前 <span class="hl-yellow">${gcdLen}</span> 个字符 → 候选公因子 = <span class="hl-green">"${candidate}"</span>`
+      });
+
+      // Step: Verify str1 = candidate repeated
+      const repeat1 = len1 / gcdLen;
+      arr.push({
+        type: 'verify-str1',
+        candidate, repeatCount: repeat1,
+        codeLine: 8,
+        flowNode: 'flow-substr',
+        info: `验证 str1：<span class="hl-green">"${candidate}"</span> × ${repeat1} = "${candidate.repeat(repeat1)}" ${candidate.repeat(repeat1) === s1 ? '=== str1 <span class="hl-green">✅</span>' : '≠ str1 <span class="hl-red">❌</span>'}`
+      });
+
+      // Step: Verify str2 = candidate repeated
+      const repeat2 = len2 / gcdLen;
+      arr.push({
+        type: 'verify-str2',
+        candidate, repeatCount: repeat2,
+        codeLine: 8,
+        flowNode: 'flow-substr',
+        info: `验证 str2：<span class="hl-green">"${candidate}"</span> × ${repeat2} = "${candidate.repeat(repeat2)}" ${candidate.repeat(repeat2) === s2 ? '=== str2 <span class="hl-green">✅</span>' : '≠ str2 <span class="hl-red">❌</span>'}`
+      });
+
+      // Step: Final result
+      arr.push({
+        type: 'result',
+        candidate,
+        codeLine: 8,
+        flowNode: 'flow-result',
+        info: `🎉 最大公因子为 <span class="hl-green">"${candidate}"</span>，它能同时除尽 str1 和 str2！`
+      });
+
+      return arr;
+    }
+
+    // === Render ===
+    function renderCells() {
+      const c1 = document.getElementById('str1Cells');
+      c1.innerHTML = '';
+      for (let i = 0; i < str1.length; i++) {
+        const d = document.createElement('div');
+        d.className = 'char-cell str1-cell';
+        d.textContent = str1[i];
+        d.id = `s1-${i}`;
+        c1.appendChild(d);
+      }
+
+      const c2 = document.getElementById('str2Cells');
+      c2.innerHTML = '';
+      for (let i = 0; i < str2.length; i++) {
+        const d = document.createElement('div');
+        d.className = 'char-cell str2-cell';
+        d.textContent = str2[i];
+        d.id = `s2-${i}`;
+        c2.appendChild(d);
+      }
+    }
+
+    function clearHighlights() {
+      document.querySelectorAll('.char-cell').forEach(el => {
+        el.classList.remove('match', 'mismatch', 'candidate', 'gcd-result');
+      });
+      document.querySelectorAll('.code-line').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.flow-node').forEach(el => el.classList.remove('active-flow'));
+    }
+
+    function renderStep(idx) {
+      if (idx < 0 || idx >= steps.length) return;
+      const step = steps[idx];
+
+      clearHighlights();
+
+      // Highlight code line
+      const cl = document.querySelector(`.code-line[data-line="${step.codeLine}"]`);
+      if (cl) cl.classList.add('active');
+
+      // Highlight flow node
+      const fn = document.getElementById(step.flowNode);
+      if (fn) fn.classList.add('active-flow');
+
+      // Step info
+      document.getElementById('stepInfo').innerHTML = `<strong>步骤 ${idx + 1}/${steps.length}：</strong>${step.info}`;
+
+      const candSection = document.getElementById('candidateSection');
+      const candTitle = document.getElementById('candidateTitle');
+      const candDisplay = document.getElementById('candidateDisplay');
+      const verifySection = document.getElementById('verifySection');
+      const resultSection = document.getElementById('resultSection');
+
+      switch (step.type) {
+        case 'init':
+          candTitle.textContent = '准备开始分析...';
+          candDisplay.innerHTML = '';
+          verifySection.style.display = 'none';
+          resultSection.classList.remove('show');
+          break;
+
+        case 'concat-check':
+          candTitle.textContent = '拼接验证';
+          candDisplay.innerHTML = '';
+
+          // Show concat1
+          const row1 = document.createElement('div');
+          row1.style.cssText = 'display:flex;flex-direction:column;gap:6px;width:100%;';
+
+          const line1 = document.createElement('div');
+          line1.style.cssText = 'display:flex;align-items:center;gap:8px;flex-wrap:wrap;';
+          line1.innerHTML = `<span style="color:#4facfe;font-weight:600;width:90px;flex-shrink:0;">str1+str2 =</span>`;
+          const cells1 = document.createElement('div');
+          cells1.className = 'char-cells';
+          for (let i = 0; i < step.concat1.length; i++) {
+            const c = document.createElement('div');
+            c.className = 'repeat-cell ' + (i < str1.length ? 'group-a' : 'group-b');
+            c.textContent = step.concat1[i];
+            cells1.appendChild(c);
+          }
+          line1.appendChild(cells1);
+
+          const line2 = document.createElement('div');
+          line2.style.cssText = 'display:flex;align-items:center;gap:8px;flex-wrap:wrap;';
+          line2.innerHTML = `<span style="color:#f093fb;font-weight:600;width:90px;flex-shrink:0;">str2+str1 =</span>`;
+          const cells2 = document.createElement('div');
+          cells2.className = 'char-cells';
+          for (let i = 0; i < step.concat2.length; i++) {
+            const c = document.createElement('div');
+            c.className = 'repeat-cell ' + (i < str2.length ? 'group-b' : 'group-a');
+            c.textContent = step.concat2[i];
+            // Highlight match/mismatch
+            if (step.concat1[i] === step.concat2[i]) {
+              c.style.borderColor = 'rgba(56,239,125,0.5)';
+            } else {
+              c.style.borderColor = 'rgba(255,75,75,0.6)';
+              c.style.background = 'rgba(255,75,75,0.15)';
+              c.style.color = '#ff4b4b';
+            }
+            cells2.appendChild(c);
+          }
+          line2.appendChild(cells2);
+
+          const resultTag = document.createElement('div');
+          resultTag.style.cssText = 'margin-top:6px;font-weight:600;font-size:0.9rem;';
+          resultTag.innerHTML = step.isEqual
+            ? '<span style="color:#38ef7d;">✅ 相等 → 存在公因子</span>'
+            : '<span style="color:#ff4b4b;">❌ 不相等 → 无公因子</span>';
+
+          row1.appendChild(line1);
+          row1.appendChild(line2);
+          row1.appendChild(resultTag);
+          candDisplay.appendChild(row1);
+          break;
+
+        case 'no-gcd':
+          resultSection.classList.add('show');
+          document.getElementById('resultValue').textContent = '"" (空串)';
+          document.getElementById('resultValue').style.color = '#ff4b4b';
+          document.querySelector('.result-label').textContent = '❌ 结果：';
+          document.querySelector('.result-label').style.color = '#ff4b4b';
+          resultSection.style.borderColor = 'rgba(255,75,75,0.3)';
+          resultSection.style.background = 'rgba(255,75,75,0.08)';
+          break;
+
+        case 'gcd-calc': {
+          candTitle.textContent = '辗转相除法计算 GCD';
+          candDisplay.innerHTML = '';
+
+          const gcdDiv = document.createElement('div');
+          gcdDiv.style.cssText = 'display:flex;flex-direction:column;gap:6px;';
+
+          step.gcdSteps.forEach((s, i) => {
+            const row = document.createElement('div');
+            row.style.cssText = 'display:flex;align-items:center;gap:8px;font-size:0.9rem;';
+            if (i < step.gcdSteps.length - 1) {
+              const next = step.gcdSteps[i + 1];
+              row.innerHTML = `<span style="color:#aaa;">gcd(${s.a}, ${s.b})</span> <span style="color:#56b6c2;">→</span> <span style="color:#e5c07b;">${s.a} % ${s.b} = ${s.a % s.b}</span> <span style="color:#56b6c2;">→</span> <span style="color:#aaa;">gcd(${next.a}, ${next.b})</span>`;
+            } else {
+              row.innerHTML = `<span style="color:#38ef7d;font-weight:700;">gcd(${s.a}, 0) = ${s.a}</span>`;
+            }
+            gcdDiv.appendChild(row);
+          });
+
+          const resultTag = document.createElement('div');
+          resultTag.style.cssText = 'margin-top:8px;';
+          resultTag.innerHTML = `<span class="candidate-tag pass">公因子长度 = ${step.gcdLen}</span>`;
+          gcdDiv.appendChild(resultTag);
+          candDisplay.appendChild(gcdDiv);
+          break;
+        }
+
+        case 'candidate': {
+          candTitle.textContent = '截取候选公因子';
+          candDisplay.innerHTML = '';
+
+          // Highlight cells in str1
+          for (let i = 0; i < step.gcdLen; i++) {
+            const el = document.getElementById(`s1-${i}`);
+            if (el) el.classList.add('candidate');
+          }
+
+          const tag = document.createElement('span');
+          tag.className = 'candidate-tag testing';
+          tag.textContent = `"${step.candidate}" (前${step.gcdLen}个字符)`;
+          candDisplay.appendChild(tag);
+          break;
+        }
+
+        case 'verify-str1': {
+          verifySection.style.display = 'block';
+          document.getElementById('verifyTitle').textContent = '验证：候选串能否除尽 str1';
+          const vc = document.getElementById('verifyContent');
+          vc.innerHTML = '';
+
+          const row = document.createElement('div');
+          row.className = 'verify-row';
+
+          const cells = document.createElement('div');
+          cells.className = 'repeat-cells';
+          const cand = step.candidate;
+          for (let r = 0; r < step.repeatCount; r++) {
+            for (let c = 0; c < cand.length; c++) {
+              const d = document.createElement('div');
+              d.className = 'repeat-cell ' + (r % 2 === 0 ? 'group-a' : 'group-b');
+              d.textContent = cand[c];
+              cells.appendChild(d);
+            }
+          }
+
+          row.innerHTML = `<span class="verify-label" style="color:#4facfe;">"${cand}" × ${step.repeatCount} =</span>`;
+          row.appendChild(cells);
+
+          const check = document.createElement('span');
+          check.className = 'verify-result ok';
+          check.textContent = '= str1 ✅';
+          row.appendChild(check);
+          vc.appendChild(row);
+
+          // Mark str1 cells as match
+          for (let i = 0; i < str1.length; i++) {
+            const el = document.getElementById(`s1-${i}`);
+            if (el) el.classList.add('match');
+          }
+          break;
+        }
+
+        case 'verify-str2': {
+          const vc = document.getElementById('verifyContent');
+          document.getElementById('verifyTitle').textContent = '验证：候选串能否除尽 str1 和 str2';
+
+          const row = document.createElement('div');
+          row.className = 'verify-row';
+
+          const cells = document.createElement('div');
+          cells.className = 'repeat-cells';
+          const cand = step.candidate;
+          for (let r = 0; r < step.repeatCount; r++) {
+            for (let c = 0; c < cand.length; c++) {
+              const d = document.createElement('div');
+              d.className = 'repeat-cell ' + (r % 2 === 0 ? 'group-b' : 'group-a');
+              d.textContent = cand[c];
+              cells.appendChild(d);
+            }
+          }
+
+          row.innerHTML = `<span class="verify-label" style="color:#f093fb;">"${cand}" × ${step.repeatCount} =</span>`;
+          row.appendChild(cells);
+
+          const check = document.createElement('span');
+          check.className = 'verify-result ok';
+          check.textContent = '= str2 ✅';
+          row.appendChild(check);
+          vc.appendChild(row);
+
+          // Mark str2 cells as match
+          for (let i = 0; i < str2.length; i++) {
+            const el = document.getElementById(`s2-${i}`);
+            if (el) el.classList.add('match');
+          }
+          break;
+        }
+
+        case 'result': {
+          resultSection.classList.add('show');
+          resultSection.style.borderColor = 'rgba(56,239,125,0.3)';
+          resultSection.style.background = 'rgba(56,239,125,0.08)';
+          document.querySelector('.result-label').textContent = '🎉 最大公因子：';
+          document.querySelector('.result-label').style.color = '#38ef7d';
+          document.getElementById('resultValue').textContent = `"${step.candidate}"`;
+          document.getElementById('resultValue').style.color = '#38ef7d';
+
+          // Glow result cells
+          const gcdLen = step.candidate.length;
+          for (let i = 0; i < gcdLen; i++) {
+            const e1 = document.getElementById(`s1-${i}`);
+            if (e1) { e1.classList.remove('match'); e1.classList.add('gcd-result'); }
+            const e2 = document.getElementById(`s2-${i}`);
+            if (e2) { e2.classList.remove('match'); e2.classList.add('gcd-result'); }
+          }
+          break;
+        }
+      }
+    }
+
+    // === Controls ===
+    function initViz() {
+      str1 = document.getElementById('str1Input').value.toUpperCase() || 'ABCABC';
+      str2 = document.getElementById('str2Input').value.toUpperCase() || 'ABC';
+      steps = generateSteps(str1, str2);
+      currentStep = -1;
+      renderCells();
+      clearHighlights();
+      document.getElementById('candidateSection').querySelector('.candidate-title').textContent = '等待开始...';
+      document.getElementById('candidateDisplay').innerHTML = '';
+      document.getElementById('verifySection').style.display = 'none';
+      document.getElementById('verifyContent').innerHTML = '';
+      document.getElementById('resultSection').classList.remove('show');
+      document.getElementById('stepInfo').innerHTML = `点击 <span class="hl-yellow">自动演示</span> 或 <span class="hl-yellow">单步</span> 开始。str1="${str1}", str2="${str2}"`;
+    }
+
+    function stepForward() {
+      if (currentStep === -1) initViz();
+      if (currentStep < steps.length - 1) {
+        currentStep++;
+        renderStep(currentStep);
+      }
+    }
+
+    function getDelay() {
+      const v = document.getElementById('speedRange').value;
+      return 1400 - v * 130;
+    }
+
+    function runAuto() {
+      if (isPlaying) {
+        clearTimeout(autoTimer);
+        isPlaying = false;
+        document.querySelector('.btn-run').textContent = '▶ 自动演示';
+        return;
+      }
+
+      if (currentStep === -1 || currentStep >= steps.length - 1) {
+        initViz();
+      }
+
+      isPlaying = true;
+      document.querySelector('.btn-run').textContent = '⏸ 暂停';
+
+      function tick() {
+        if (currentStep < steps.length - 1) {
+          currentStep++;
+          renderStep(currentStep);
+          autoTimer = setTimeout(tick, getDelay());
+        } else {
+          isPlaying = false;
+          document.querySelector('.btn-run').textContent = '▶ 自动演示';
+        }
+      }
+      tick();
+    }
+
+    function resetViz() {
+      clearTimeout(autoTimer);
+      isPlaying = false;
+      document.querySelector('.btn-run').textContent = '▶ 自动演示';
+      initViz();
+    }
+
+    // Init
+    window.addEventListener('DOMContentLoaded', initViz);
+  </script>
+</body>
+</html>

@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Merge Strings Alternately - Interactive Visualization</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      min-height: 100vh;
+      color: #fff;
+      padding: 30px 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 8px;
+      background: linear-gradient(90deg, #f093fb, #f5576c, #4facfe);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #aaa;
+      margin-bottom: 30px;
+      font-size: 0.95rem;
+    }
+
+    /* Input Section */
+    .input-section {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      margin-bottom: 30px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .input-group label {
+      font-size: 0.85rem;
+      color: #bbb;
+      font-weight: 600;
+    }
+
+    .input-group input {
+      padding: 10px 16px;
+      border: 2px solid rgba(255,255,255,0.15);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      font-size: 1.1rem;
+      width: 220px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .input-group input:focus {
+      border-color: #4facfe;
+    }
+
+    .btn {
+      padding: 10px 28px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-run {
+      background: linear-gradient(135deg, #4facfe, #00f2fe);
+      color: #000;
+    }
+
+    .btn-run:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
+    }
+
+    .btn-step {
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+      color: #fff;
+    }
+
+    .btn-step:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(245, 87, 108, 0.4);
+    }
+
+    .btn-reset {
+      background: rgba(255,255,255,0.12);
+      color: #ccc;
+    }
+
+    .btn-reset:hover {
+      background: rgba(255,255,255,0.2);
+    }
+
+    /* Algorithm Code Section */
+    .code-section {
+      background: rgba(0,0,0,0.4);
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 30px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .code-section h2 {
+      font-size: 1.1rem;
+      margin-bottom: 16px;
+      color: #4facfe;
+    }
+
+    .code-block {
+      font-family: 'Fira Code', 'Consolas', monospace;
+      font-size: 0.88rem;
+      line-height: 1.7;
+      overflow-x: auto;
+    }
+
+    .code-line {
+      padding: 2px 10px;
+      border-radius: 4px;
+      transition: background 0.3s;
+      white-space: pre;
+    }
+
+    .code-line.active {
+      background: rgba(79, 172, 254, 0.2);
+      border-left: 3px solid #4facfe;
+    }
+
+    .keyword { color: #c678dd; }
+    .func { color: #61afef; }
+    .string { color: #98c379; }
+    .comment { color: #5c6370; font-style: italic; }
+    .variable { color: #e5c07b; }
+    .operator { color: #56b6c2; }
+    .number { color: #d19a66; }
+
+    /* Visualization Section */
+    .viz-section {
+      background: rgba(0,0,0,0.3);
+      border-radius: 14px;
+      padding: 28px;
+      margin-bottom: 30px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .viz-section h2 {
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+      color: #f093fb;
+    }
+
+    .string-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 16px;
+      gap: 10px;
+    }
+
+    .string-label {
+      font-weight: 600;
+      font-size: 0.85rem;
+      width: 70px;
+      flex-shrink: 0;
+      color: #bbb;
+    }
+
+    .char-cells {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .char-cell {
+      width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      transition: all 0.4s;
+      position: relative;
+    }
+
+    .char-cell.word1 {
+      background: rgba(79, 172, 254, 0.2);
+      border: 2px solid rgba(79, 172, 254, 0.5);
+      color: #4facfe;
+    }
+
+    .char-cell.word2 {
+      background: rgba(240, 147, 251, 0.2);
+      border: 2px solid rgba(240, 147, 251, 0.5);
+      color: #f093fb;
+    }
+
+    .char-cell.result-w1 {
+      background: rgba(79, 172, 254, 0.25);
+      border: 2px solid rgba(79, 172, 254, 0.6);
+      color: #4facfe;
+    }
+
+    .char-cell.result-w2 {
+      background: rgba(240, 147, 251, 0.25);
+      border: 2px solid rgba(240, 147, 251, 0.6);
+      color: #f093fb;
+    }
+
+    .char-cell.picked {
+      opacity: 0.3;
+      transform: scale(0.85);
+    }
+
+    .char-cell.current {
+      box-shadow: 0 0 16px rgba(255, 215, 0, 0.6);
+      border-color: #ffd700 !important;
+      transform: scale(1.12);
+    }
+
+    .char-cell.pop-in {
+      animation: popIn 0.4s ease-out;
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0); opacity: 0; }
+      60% { transform: scale(1.2); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* Pointer indicators */
+    .pointer-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 6px;
+      gap: 10px;
+    }
+
+    .pointer-label {
+      width: 70px;
+      flex-shrink: 0;
+    }
+
+    .pointer-cells {
+      display: flex;
+      gap: 4px;
+    }
+
+    .pointer-slot {
+      width: 42px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #ffd700;
+    }
+
+    /* Result display */
+    .result-row {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .result-value {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-top: 8px;
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+    }
+
+    .result-value .char-cells {
+      gap: 3px;
+    }
+
+    /* Step info */
+    .step-info {
+      margin-top: 20px;
+      padding: 14px 18px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 10px;
+      font-size: 0.92rem;
+      color: #ddd;
+      line-height: 1.6;
+      min-height: 50px;
+    }
+
+    .step-info .highlight-blue { color: #4facfe; font-weight: 600; }
+    .step-info .highlight-pink { color: #f093fb; font-weight: 600; }
+    .step-info .highlight-yellow { color: #ffd700; font-weight: 600; }
+
+    /* Flowchart section */
+    .flow-section {
+      background: rgba(0,0,0,0.3);
+      border-radius: 14px;
+      padding: 28px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .flow-section h2 {
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+      color: #00f2fe;
+    }
+
+    .flowchart {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    .flow-node {
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-align: center;
+      max-width: 320px;
+      transition: all 0.3s;
+    }
+
+    .flow-node.start {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 30px;
+    }
+
+    .flow-node.process {
+      background: rgba(79, 172, 254, 0.2);
+      border: 2px solid rgba(79, 172, 254, 0.4);
+    }
+
+    .flow-node.decision {
+      background: rgba(245, 87, 108, 0.2);
+      border: 2px solid rgba(245, 87, 108, 0.4);
+      transform: rotate(0deg);
+      clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+      padding: 30px 40px;
+      min-width: 220px;
+    }
+
+    .flow-node.end {
+      background: linear-gradient(135deg, #11998e, #38ef7d);
+      border-radius: 30px;
+      color: #000;
+    }
+
+    .flow-node.active-flow {
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+      border-color: #ffd700 !important;
+    }
+
+    .flow-arrow {
+      width: 2px;
+      height: 28px;
+      background: rgba(255,255,255,0.3);
+      position: relative;
+    }
+
+    .flow-arrow::after {
+      content: '▼';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.4);
+    }
+
+    .flow-branch {
+      display: flex;
+      gap: 40px;
+      align-items: flex-start;
+      justify-content: center;
+    }
+
+    .flow-branch-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    .flow-branch-label {
+      font-size: 0.78rem;
+      color: #aaa;
+      margin-bottom: 4px;
+    }
+
+    .speed-control {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .speed-control label {
+      font-size: 0.85rem;
+      color: #bbb;
+    }
+
+    .speed-control input[type="range"] {
+      width: 120px;
+      accent-color: #4facfe;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔀 Merge Strings Alternately</h1>
+    <p class="subtitle">LeetCode 1768 · Alternately merge two strings</p>
+
+    <!-- Input Section -->
+    <div class="input-section">
+      <div class="input-group">
+        <label>word1</label>
+        <input type="text" id="word1Input" value="abc" maxlength="15" placeholder="e.g. abc">
+      </div>
+      <div class="input-group">
+        <label>word2</label>
+        <input type="text" id="word2Input" value="pqrs" maxlength="15" placeholder="e.g. pqrs">
+      </div>
+      <button class="btn btn-run" onclick="runAutoPlay()">▶ Auto Run</button>
+      <button class="btn btn-step" onclick="stepForward()">⏭ Step</button>
+      <button class="btn btn-reset" onclick="resetViz()">↺ Reset</button>
+      <div class="speed-control">
+        <label>Speed</label>
+        <input type="range" id="speedRange" min="1" max="10" value="5">
+      </div>
+    </div>
+
+    <!-- Algorithm Code -->
+    <div class="code-section">
+      <h2>💻 JavaScript Code</h2>
+      <div class="code-block">
+        <div class="code-line" data-line="0"><span class="keyword">function</span> <span class="func">mergeAlternately</span>(<span class="variable">word1</span>, <span class="variable">word2</span>) {</div>
+        <div class="code-line" data-line="1">  <span class="keyword">let</span> <span class="variable">result</span> = <span class="string">""</span>;</div>
+        <div class="code-line" data-line="2">  <span class="keyword">let</span> <span class="variable">i</span> = <span class="number">0</span>, <span class="variable">j</span> = <span class="number">0</span>;</div>
+        <div class="code-line" data-line="3">  <span class="keyword">while</span> (<span class="variable">i</span> <span class="operator">&lt;</span> <span class="variable">word1</span>.length <span class="operator">||</span> <span class="variable">j</span> <span class="operator">&lt;</span> <span class="variable">word2</span>.length) {</div>
+        <div class="code-line" data-line="4">    <span class="keyword">if</span> (<span class="variable">i</span> <span class="operator">&lt;</span> <span class="variable">word1</span>.length) <span class="variable">result</span> <span class="operator">+=</span> <span class="variable">word1</span>[<span class="variable">i</span><span class="operator">++</span>];</div>
+        <div class="code-line" data-line="5">    <span class="keyword">if</span> (<span class="variable">j</span> <span class="operator">&lt;</span> <span class="variable">word2</span>.length) <span class="variable">result</span> <span class="operator">+=</span> <span class="variable">word2</span>[<span class="variable">j</span><span class="operator">++</span>];</div>
+        <div class="code-line" data-line="6">  }</div>
+        <div class="code-line" data-line="7">  <span class="keyword">return</span> <span class="variable">result</span>;</div>
+        <div class="code-line" data-line="8">}</div>
+      </div>
+    </div>
+
+    <!-- Visualization -->
+    <div class="viz-section">
+      <h2>🎨 Animation Visualization</h2>
+
+      <!-- word1 pointer -->
+      <div class="pointer-row">
+        <div class="pointer-label"></div>
+        <div class="pointer-cells" id="pointer1Row"></div>
+      </div>
+      <!-- word1 -->
+      <div class="string-row">
+        <div class="string-label" style="color:#4facfe;">word1</div>
+        <div class="char-cells" id="word1Cells"></div>
+      </div>
+
+      <!-- word2 pointer -->
+      <div class="pointer-row" style="margin-top:12px;">
+        <div class="pointer-label"></div>
+        <div class="pointer-cells" id="pointer2Row"></div>
+      </div>
+      <!-- word2 -->
+      <div class="string-row">
+        <div class="string-label" style="color:#f093fb;">word2</div>
+        <div class="char-cells" id="word2Cells"></div>
+      </div>
+
+      <!-- Result -->
+      <div class="result-row">
+        <div class="string-label" style="color:#38ef7d; font-size:0.95rem;">result</div>
+        <div class="result-value">
+          <div class="char-cells" id="resultCells"></div>
+        </div>
+      </div>
+
+      <!-- Step info -->
+      <div class="step-info" id="stepInfo">
+        Click <span class="highlight-yellow">Auto Run</span> or <span class="highlight-yellow">Step</span> to start the visualization.
+      </div>
+    </div>
+
+    <!-- Flowchart -->
+    <div class="flow-section">
+      <h2>📊 Algorithm Flowchart</h2>
+      <div class="flowchart">
+        <div class="flow-node start" id="flow-start">Start: i = 0, j = 0, result = ""</div>
+        <div class="flow-arrow"></div>
+        <div class="flow-node decision" id="flow-check" style="clip-path: none; border-radius: 12px; background: rgba(245, 87, 108, 0.2); border: 2px solid rgba(245, 87, 108, 0.4);">i &lt; word1.length<br>|| j &lt; word2.length ?</div>
+        <div class="flow-arrow"></div>
+        <div class="flow-branch">
+          <div class="flow-branch-item">
+            <div class="flow-branch-label">Yes & i &lt; word1.length</div>
+            <div class="flow-node process" id="flow-pick1">result += word1[i], i++</div>
+          </div>
+          <div class="flow-branch-item">
+            <div class="flow-branch-label">Yes & j &lt; word2.length</div>
+            <div class="flow-node process" id="flow-pick2" style="border-color: rgba(240,147,251,0.4); background: rgba(240,147,251,0.15);">result += word2[j], j++</div>
+          </div>
+        </div>
+        <div class="flow-arrow"></div>
+        <div class="flow-node process" id="flow-loop" style="background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.2);">↑ Loop back to condition check</div>
+        <div class="flow-arrow"></div>
+        <div class="flow-node end" id="flow-end">Return result ✅</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // === Core Algorithm ===
+    function mergeAlternately(word1, word2) {
+      let result = "";
+      let i = 0, j = 0;
+      while (i < word1.length || j < word2.length) {
+        if (i < word1.length) result += word1[i++];
+        if (j < word2.length) result += word2[j++];
+      }
+      return result;
+    }
+
+    // === Visualization State ===
+    let word1 = "", word2 = "";
+    let steps = [];
+    let currentStep = -1;
+    let autoPlayTimer = null;
+    let isPlaying = false;
+
+    // Generate steps for visualization
+    function generateSteps(w1, w2) {
+      const stepsArr = [];
+      let i = 0, j = 0;
+      const resultChars = [];
+
+      // Step 0: Initialization
+      stepsArr.push({
+        type: 'init',
+        i: 0, j: 0,
+        resultChars: [],
+        codeLine: 2,
+        flowNode: 'flow-start',
+        info: `Initialize: <span class="highlight-yellow">i = 0</span>, <span class="highlight-yellow">j = 0</span>, <span class="highlight-yellow">result = ""</span>`
+      });
+
+      while (i < w1.length || j < w2.length) {
+        // Check condition
+        stepsArr.push({
+          type: 'check',
+          i, j,
+          resultChars: [...resultChars],
+          codeLine: 3,
+          flowNode: 'flow-check',
+          info: `Loop condition: <span class="highlight-blue">i=${i}</span> < ${w1.length} ${i < w1.length ? '✅' : '❌'} || <span class="highlight-pink">j=${j}</span> < ${w2.length} ${j < w2.length ? '✅' : '❌'} → continue loop`
+        });
+
+        if (i < w1.length) {
+          resultChars.push({ char: w1[i], source: 'word1' });
+          stepsArr.push({
+            type: 'pick1',
+            i, j,
+            pickIndex: i,
+            resultChars: [...resultChars],
+            codeLine: 4,
+            flowNode: 'flow-pick1',
+            info: `Pick from <span class="highlight-blue">word1[${i}] = "${w1[i]}"</span>, append to result → i becomes ${i + 1}`
+          });
+          i++;
+        }
+
+        if (j < w2.length) {
+          resultChars.push({ char: w2[j], source: 'word2' });
+          stepsArr.push({
+            type: 'pick2',
+            i, j,
+            pickIndex: j,
+            resultChars: [...resultChars],
+            codeLine: 5,
+            flowNode: 'flow-pick2',
+            info: `Pick from <span class="highlight-pink">word2[${j}] = "${w2[j]}"</span>, append to result → j becomes ${j + 1}`
+          });
+          j++;
+        }
+      }
+
+      // Final check (loop ends)
+      stepsArr.push({
+        type: 'end-check',
+        i, j,
+        resultChars: [...resultChars],
+        codeLine: 3,
+        flowNode: 'flow-check',
+        info: `Loop condition: <span class="highlight-blue">i=${i}</span> < ${w1.length} ❌ && <span class="highlight-pink">j=${j}</span> < ${w2.length} ❌ → exit loop`
+      });
+
+      // Return
+      stepsArr.push({
+        type: 'return',
+        i, j,
+        resultChars: [...resultChars],
+        codeLine: 7,
+        flowNode: 'flow-end',
+        info: `Return result: <span class="highlight-yellow">"${resultChars.map(r => r.char).join('')}"</span> 🎉`
+      });
+
+      return stepsArr;
+    }
+
+    // === Render Functions ===
+    function renderCells() {
+      // word1 cells
+      const w1Container = document.getElementById('word1Cells');
+      w1Container.innerHTML = '';
+      for (let k = 0; k < word1.length; k++) {
+        const cell = document.createElement('div');
+        cell.className = 'char-cell word1';
+        cell.textContent = word1[k];
+        cell.id = `w1-${k}`;
+        w1Container.appendChild(cell);
+      }
+
+      // word2 cells
+      const w2Container = document.getElementById('word2Cells');
+      w2Container.innerHTML = '';
+      for (let k = 0; k < word2.length; k++) {
+        const cell = document.createElement('div');
+        cell.className = 'char-cell word2';
+        cell.textContent = word2[k];
+        cell.id = `w2-${k}`;
+        w2Container.appendChild(cell);
+      }
+
+      // Pointer rows
+      renderPointers(-1, -1);
+
+      // Clear result
+      document.getElementById('resultCells').innerHTML = '';
+    }
+
+    function renderPointers(iPos, jPos) {
+      const p1 = document.getElementById('pointer1Row');
+      p1.innerHTML = '';
+      for (let k = 0; k < word1.length; k++) {
+        const slot = document.createElement('div');
+        slot.className = 'pointer-slot';
+        slot.textContent = k === iPos ? '↓ i' : '';
+        p1.appendChild(slot);
+      }
+
+      const p2 = document.getElementById('pointer2Row');
+      p2.innerHTML = '';
+      for (let k = 0; k < word2.length; k++) {
+        const slot = document.createElement('div');
+        slot.className = 'pointer-slot';
+        slot.textContent = k === jPos ? '↓ j' : '';
+        p2.appendChild(slot);
+      }
+    }
+
+    function renderStep(stepIndex) {
+      if (stepIndex < 0 || stepIndex >= steps.length) return;
+      const step = steps[stepIndex];
+
+      // Reset all char-cell states
+      document.querySelectorAll('.char-cell.word1, .char-cell.word2').forEach(el => {
+        el.classList.remove('picked', 'current');
+      });
+
+      // Mark picked cells (all chars already added to result)
+      const pickedW1 = new Set();
+      const pickedW2 = new Set();
+      for (const rc of step.resultChars) {
+        // Count occurrences to find index
+      }
+      // Simpler: track by i and j values
+      let wi = 0, wj = 0;
+      for (const rc of step.resultChars) {
+        if (rc.source === 'word1') {
+          pickedW1.add(wi);
+          wi++;
+        } else {
+          pickedW2.add(wj);
+          wj++;
+        }
+      }
+
+      pickedW1.forEach(idx => {
+        const el = document.getElementById(`w1-${idx}`);
+        if (el) el.classList.add('picked');
+      });
+      pickedW2.forEach(idx => {
+        const el = document.getElementById(`w2-${idx}`);
+        if (el) el.classList.add('picked');
+      });
+
+      // Mark current cell
+      if (step.type === 'pick1') {
+        const el = document.getElementById(`w1-${step.pickIndex}`);
+        if (el) {
+          el.classList.remove('picked');
+          el.classList.add('current');
+        }
+      } else if (step.type === 'pick2') {
+        const el = document.getElementById(`w2-${step.pickIndex}`);
+        if (el) {
+          el.classList.remove('picked');
+          el.classList.add('current');
+        }
+      }
+
+      // Render pointers
+      const pI = step.i < word1.length ? step.i : -1;
+      const pJ = step.j < word2.length ? step.j : -1;
+      renderPointers(
+        step.type === 'pick1' ? step.pickIndex : pI,
+        step.type === 'pick2' ? step.pickIndex : pJ
+      );
+
+      // Render result
+      const resultContainer = document.getElementById('resultCells');
+      const existingCount = resultContainer.children.length;
+      // Only add new cells
+      for (let k = existingCount; k < step.resultChars.length; k++) {
+        const rc = step.resultChars[k];
+        const cell = document.createElement('div');
+        cell.className = `char-cell ${rc.source === 'word1' ? 'result-w1' : 'result-w2'} pop-in`;
+        cell.textContent = rc.char;
+        resultContainer.appendChild(cell);
+      }
+
+      // Highlight code line
+      document.querySelectorAll('.code-line').forEach(el => el.classList.remove('active'));
+      const codeLine = document.querySelector(`.code-line[data-line="${step.codeLine}"]`);
+      if (codeLine) codeLine.classList.add('active');
+
+      // Highlight flow node
+      document.querySelectorAll('.flow-node').forEach(el => el.classList.remove('active-flow'));
+      const flowNode = document.getElementById(step.flowNode);
+      if (flowNode) flowNode.classList.add('active-flow');
+
+      // Step info
+      document.getElementById('stepInfo').innerHTML = `<strong>Step ${stepIndex + 1}/${steps.length}:</strong> ${step.info}`;
+    }
+
+    // === Controls ===
+    function initViz() {
+      word1 = document.getElementById('word1Input').value || 'abc';
+      word2 = document.getElementById('word2Input').value || 'pqrs';
+      steps = generateSteps(word1, word2);
+      currentStep = -1;
+      renderCells();
+      document.querySelectorAll('.code-line').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.flow-node').forEach(el => el.classList.remove('active-flow'));
+      document.getElementById('stepInfo').innerHTML = `Click <span class="highlight-yellow">Auto Run</span> or <span class="highlight-yellow">Step</span> to start. word1="${word1}", word2="${word2}"`;
+    }
+
+    function stepForward() {
+      if (currentStep === -1) initViz();
+      if (currentStep < steps.length - 1) {
+        currentStep++;
+        renderStep(currentStep);
+      }
+    }
+
+    function getSpeed() {
+      const val = document.getElementById('speedRange').value;
+      // val 1~10 → delay 1200ms~100ms
+      return 1300 - val * 120;
+    }
+
+    function runAutoPlay() {
+      if (isPlaying) {
+        // Pause
+        clearInterval(autoPlayTimer);
+        isPlaying = false;
+        document.querySelector('.btn-run').textContent = '▶ Auto Run';
+        return;
+      }
+
+      if (currentStep === -1 || currentStep >= steps.length - 1) {
+        initViz();
+      }
+
+      isPlaying = true;
+      document.querySelector('.btn-run').textContent = '⏸ Pause';
+
+      function tick() {
+        if (currentStep < steps.length - 1) {
+          currentStep++;
+          renderStep(currentStep);
+          autoPlayTimer = setTimeout(tick, getSpeed());
+        } else {
+          isPlaying = false;
+          document.querySelector('.btn-run').textContent = '▶ Auto Run';
+        }
+      }
+      tick();
+    }
+
+    function resetViz() {
+      clearInterval(autoPlayTimer);
+      isPlaying = false;
+      document.querySelector('.btn-run').textContent = '▶ Auto Run';
+      initViz();
+    }
+
+    // Initialize on load
+    window.addEventListener('DOMContentLoaded', initViz);
+  </script>
+</body>
+</html>

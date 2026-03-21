@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>拥有最多糖果的孩子 - 交互式图解</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: linear-gradient(135deg, #1a0a2e, #2d1b4e, #1a1040);
+      min-height: 100vh;
+      color: #fff;
+      padding: 30px 20px;
+    }
+
+    .container { max-width: 1000px; margin: 0 auto; }
+
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 6px;
+      background: linear-gradient(90deg, #ff6b6b, #ffd93d, #6bcb77);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #999;
+      margin-bottom: 28px;
+      font-size: 0.92rem;
+    }
+
+    /* === 题目描述 === */
+    .problem-section {
+      background: rgba(255,255,255,0.05);
+      border-radius: 14px;
+      padding: 22px 26px;
+      margin-bottom: 24px;
+      border: 1px solid rgba(255,255,255,0.08);
+      line-height: 1.85;
+      font-size: 0.93rem;
+      color: #ccc;
+    }
+
+    .problem-section strong { color: #ffd93d; }
+    .problem-section code {
+      background: rgba(255,217,61,0.12);
+      padding: 2px 7px;
+      border-radius: 4px;
+      color: #ffd93d;
+      font-size: 0.88rem;
+    }
+
+    /* === 输入区 === */
+    .input-section {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .input-group label {
+      font-size: 0.82rem;
+      color: #aaa;
+      font-weight: 600;
+    }
+
+    .input-group input {
+      padding: 10px 14px;
+      border: 2px solid rgba(255,255,255,0.12);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.07);
+      color: #fff;
+      font-size: 1.05rem;
+      width: 260px;
+      outline: none;
+      transition: border-color 0.3s;
+      font-family: 'Fira Code', Consolas, monospace;
+    }
+
+    .input-group input.short { width: 120px; }
+
+    .input-group input:focus { border-color: #ffd93d; }
+
+    .btn {
+      padding: 10px 24px;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn:hover { transform: translateY(-2px); }
+
+    .btn-run {
+      background: linear-gradient(135deg, #ffd93d, #ff6b6b);
+      color: #000;
+    }
+
+    .btn-run:hover { box-shadow: 0 6px 20px rgba(255,107,107,0.4); }
+
+    .btn-step {
+      background: linear-gradient(135deg, #6bcb77, #38ef7d);
+      color: #000;
+    }
+
+    .btn-step:hover { box-shadow: 0 6px 20px rgba(107,203,119,0.4); }
+
+    .btn-reset {
+      background: rgba(255,255,255,0.1);
+      color: #ccc;
+    }
+
+    .btn-reset:hover { background: rgba(255,255,255,0.18); }
+
+    .speed-control {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .speed-control label { font-size: 0.82rem; color: #aaa; }
+    .speed-control input[type="range"] { width: 100px; accent-color: #ffd93d; }
+
+    /* === 快捷示例 === */
+    .examples {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .example-btn {
+      padding: 6px 14px;
+      border: 1.5px solid rgba(255,255,255,0.12);
+      border-radius: 8px;
+      background: rgba(255,255,255,0.05);
+      color: #bbb;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .example-btn:hover {
+      border-color: #ffd93d;
+      color: #ffd93d;
+      background: rgba(255,217,61,0.08);
+    }
+
+    /* === 核心思路 === */
+    .idea-section {
+      background: rgba(0,0,0,0.35);
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 24px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .idea-section h2 {
+      font-size: 1.1rem;
+      margin-bottom: 16px;
+      color: #ffd93d;
+    }
+
+    .idea-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px;
+    }
+
+    .idea-card {
+      background: rgba(255,255,255,0.04);
+      border-radius: 10px;
+      padding: 16px;
+      border-left: 3px solid;
+      transition: all 0.3s;
+    }
+
+    .idea-card:nth-child(1) { border-color: #ff6b6b; }
+    .idea-card:nth-child(2) { border-color: #ffd93d; }
+    .idea-card:nth-child(3) { border-color: #6bcb77; }
+
+    .idea-card h3 { font-size: 0.92rem; margin-bottom: 8px; }
+
+    .idea-card p {
+      font-size: 0.84rem;
+      color: #bbb;
+      line-height: 1.65;
+    }
+
+    .idea-card code {
+      background: rgba(255,255,255,0.08);
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 0.82rem;
+    }
+
+    /* === 代码区 === */
+    .code-section {
+      background: rgba(0,0,0,0.4);
+      border-radius: 14px;
+      padding: 22px;
+      margin-bottom: 24px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .code-section h2 {
+      font-size: 1.1rem;
+      margin-bottom: 14px;
+      color: #6bcb77;
+    }
+
+    .code-block {
+      font-family: 'Fira Code', Consolas, monospace;
+      font-size: 0.85rem;
+      line-height: 1.75;
+      overflow-x: auto;
+    }
+
+    .code-line {
+      padding: 2px 10px;
+      border-radius: 4px;
+      transition: background 0.3s;
+      white-space: pre;
+      border-left: 3px solid transparent;
+    }
+
+    .code-line.active {
+      background: rgba(255,217,61,0.15);
+      border-left-color: #ffd93d;
+    }
+
+    .keyword { color: #c678dd; }
+    .func { color: #61afef; }
+    .string { color: #98c379; }
+    .comment { color: #5c6370; font-style: italic; }
+    .variable { color: #e5c07b; }
+    .operator { color: #56b6c2; }
+    .number { color: #d19a66; }
+
+    /* === 可视化区 === */
+    .viz-section {
+      background: rgba(0,0,0,0.3);
+      border-radius: 14px;
+      padding: 26px;
+      margin-bottom: 24px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .viz-section h2 {
+      font-size: 1.1rem;
+      margin-bottom: 18px;
+      color: #ff6b6b;
+    }
+
+    /* 孩子们的卡片 */
+    .kids-row {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+
+    .kid-card {
+      width: 120px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 14px;
+      padding: 16px 12px;
+      text-align: center;
+      border: 2px solid rgba(255,255,255,0.1);
+      transition: all 0.4s;
+      position: relative;
+    }
+
+    .kid-card .kid-emoji {
+      font-size: 2.2rem;
+      margin-bottom: 6px;
+      display: block;
+      transition: transform 0.3s;
+    }
+
+    .kid-card .kid-label {
+      font-size: 0.78rem;
+      color: #888;
+      margin-bottom: 6px;
+    }
+
+    .kid-card .kid-candies {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #ffd93d;
+      font-family: 'Fira Code', Consolas, monospace;
+      transition: all 0.3s;
+    }
+
+    .kid-card .kid-candies-label {
+      font-size: 0.72rem;
+      color: #777;
+      margin-top: 2px;
+    }
+
+    .kid-card .extra-badge {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 10px;
+      opacity: 0;
+      transform: scale(0);
+      transition: all 0.3s;
+    }
+
+    .kid-card .extra-badge.show {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .kid-card .total-display {
+      margin-top: 8px;
+      font-size: 0.82rem;
+      color: #aaa;
+      opacity: 0;
+      transition: all 0.3s;
+    }
+
+    .kid-card .total-display.show { opacity: 1; }
+
+    .kid-card .total-value {
+      font-size: 1.2rem;
+      font-weight: 700;
+      font-family: 'Fira Code', Consolas, monospace;
+    }
+
+    .kid-card .result-badge {
+      margin-top: 8px;
+      padding: 4px 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      opacity: 0;
+      transform: translateY(5px);
+      transition: all 0.3s;
+    }
+
+    .kid-card .result-badge.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .kid-card .result-badge.pass {
+      background: rgba(107,203,119,0.2);
+      color: #6bcb77;
+      border: 1px solid rgba(107,203,119,0.4);
+    }
+
+    .kid-card .result-badge.fail {
+      background: rgba(255,107,107,0.15);
+      color: #ff6b6b;
+      border: 1px solid rgba(255,107,107,0.3);
+    }
+
+    .kid-card.checking {
+      border-color: #ffd93d;
+      box-shadow: 0 0 20px rgba(255,217,61,0.3);
+      transform: translateY(-4px);
+    }
+
+    .kid-card.checking .kid-emoji { transform: scale(1.15); }
+
+    .kid-card.passed {
+      border-color: #6bcb77;
+      background: rgba(107,203,119,0.08);
+    }
+
+    .kid-card.failed {
+      border-color: rgba(255,107,107,0.4);
+      background: rgba(255,107,107,0.05);
+    }
+
+    /* 最大值指示条 */
+    .max-bar-section {
+      margin-bottom: 20px;
+      padding: 16px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 10px;
+    }
+
+    .max-bar-title {
+      font-size: 0.85rem;
+      color: #aaa;
+      margin-bottom: 10px;
+    }
+
+    .bar-container {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+      height: 140px;
+      padding: 0 10px;
+    }
+
+    .bar-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      height: 100%;
+      justify-content: flex-end;
+    }
+
+    .bar-value {
+      font-size: 0.82rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: #ffd93d;
+      font-family: 'Fira Code', Consolas, monospace;
+    }
+
+    .bar-fill {
+      width: 100%;
+      max-width: 60px;
+      border-radius: 6px 6px 0 0;
+      transition: all 0.5s;
+      min-height: 4px;
+      position: relative;
+    }
+
+    .bar-fill.normal {
+      background: linear-gradient(180deg, #ffd93d, #f0932b);
+    }
+
+    .bar-fill.with-extra {
+      background: linear-gradient(180deg, #6bcb77, #38ef7d);
+    }
+
+    .bar-fill.is-max {
+      box-shadow: 0 0 12px rgba(255,107,107,0.5);
+    }
+
+    .bar-label {
+      font-size: 0.75rem;
+      color: #888;
+      margin-top: 6px;
+    }
+
+    .max-line {
+      position: absolute;
+      top: 0;
+      left: -20px;
+      right: -20px;
+      height: 2px;
+      border-top: 2px dashed rgba(255,107,107,0.6);
+      pointer-events: none;
+    }
+
+    .max-line-label {
+      position: absolute;
+      top: -18px;
+      right: 0;
+      font-size: 0.7rem;
+      color: #ff6b6b;
+      white-space: nowrap;
+      font-weight: 600;
+    }
+
+    /* 比较过程面板 */
+    .compare-panel {
+      padding: 18px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 10px;
+      margin-bottom: 16px;
+      min-height: 60px;
+    }
+
+    .compare-title {
+      font-size: 0.88rem;
+      color: #aaa;
+      margin-bottom: 12px;
+    }
+
+    .compare-formula {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      flex-wrap: wrap;
+      font-family: 'Fira Code', Consolas, monospace;
+    }
+
+    .compare-formula .candy-val {
+      color: #ffd93d;
+      background: rgba(255,217,61,0.12);
+      padding: 4px 12px;
+      border-radius: 8px;
+    }
+
+    .compare-formula .op { color: #56b6c2; }
+
+    .compare-formula .extra-val {
+      color: #ff6b6b;
+      background: rgba(255,107,107,0.12);
+      padding: 4px 12px;
+      border-radius: 8px;
+    }
+
+    .compare-formula .total-val {
+      color: #6bcb77;
+      background: rgba(107,203,119,0.12);
+      padding: 4px 12px;
+      border-radius: 8px;
+    }
+
+    .compare-formula .max-val {
+      color: #ff6b6b;
+      background: rgba(255,107,107,0.1);
+      padding: 4px 12px;
+      border-radius: 8px;
+      border: 1px dashed rgba(255,107,107,0.4);
+    }
+
+    .compare-formula .result-text {
+      padding: 4px 14px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+    }
+
+    .compare-formula .result-text.yes {
+      color: #6bcb77;
+      background: rgba(107,203,119,0.15);
+    }
+
+    .compare-formula .result-text.no {
+      color: #ff6b6b;
+      background: rgba(255,107,107,0.12);
+    }
+
+    /* 结果数组展示 */
+    .result-array-section {
+      padding: 16px 18px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 10px;
+      margin-bottom: 16px;
+    }
+
+    .result-array-title {
+      font-size: 0.85rem;
+      color: #aaa;
+      margin-bottom: 10px;
+    }
+
+    .result-array {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      font-family: 'Fira Code', Consolas, monospace;
+      flex-wrap: wrap;
+    }
+
+    .result-bracket {
+      font-size: 1.3rem;
+      color: #666;
+      font-weight: 300;
+    }
+
+    .result-item {
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      transition: all 0.3s;
+      background: rgba(255,255,255,0.06);
+      color: #555;
+      border: 1.5px solid rgba(255,255,255,0.08);
+    }
+
+    .result-item.true-val {
+      background: rgba(107,203,119,0.15);
+      color: #6bcb77;
+      border-color: rgba(107,203,119,0.35);
+    }
+
+    .result-item.false-val {
+      background: rgba(255,107,107,0.12);
+      color: #ff6b6b;
+      border-color: rgba(255,107,107,0.3);
+    }
+
+    .result-comma {
+      color: #555;
+      font-size: 1rem;
+    }
+
+    /* 步骤信息 */
+    .step-info {
+      margin-top: 18px;
+      padding: 14px 18px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 10px;
+      font-size: 0.9rem;
+      color: #ddd;
+      line-height: 1.7;
+      min-height: 48px;
+    }
+
+    .hl-red { color: #ff6b6b; font-weight: 600; }
+    .hl-yellow { color: #ffd93d; font-weight: 600; }
+    .hl-green { color: #6bcb77; font-weight: 600; }
+    .hl-blue { color: #61afef; font-weight: 600; }
+
+    /* === 流程图 === */
+    .flow-section {
+      background: rgba(0,0,0,0.3);
+      border-radius: 14px;
+      padding: 26px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .flow-section h2 {
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+      color: #ffd93d;
+    }
+
+    .flowchart {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    .flow-node {
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-align: center;
+      max-width: 380px;
+      transition: all 0.3s;
+    }
+
+    .flow-node.start {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 28px;
+    }
+
+    .flow-node.process {
+      background: rgba(79,172,254,0.12);
+      border: 2px solid rgba(79,172,254,0.3);
+    }
+
+    .flow-node.decision {
+      background: rgba(255,217,61,0.1);
+      border: 2px solid rgba(255,217,61,0.3);
+    }
+
+    .flow-node.end-node {
+      background: linear-gradient(135deg, #11998e, #38ef7d);
+      border-radius: 28px;
+      color: #000;
+    }
+
+    .flow-node.active-flow {
+      box-shadow: 0 0 22px rgba(255,217,61,0.5);
+      border-color: #ffd93d !important;
+    }
+
+    .flow-arrow {
+      width: 2px;
+      height: 22px;
+      background: rgba(255,255,255,0.2);
+      position: relative;
+    }
+
+    .flow-arrow::after {
+      content: '▼';
+      position: absolute;
+      bottom: -9px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.6rem;
+      color: rgba(255,255,255,0.3);
+    }
+
+    .flow-branch {
+      display: flex;
+      gap: 60px;
+      justify-content: center;
+      margin-top: 4px;
+    }
+
+    .flow-branch-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .flow-branch-label {
+      font-size: 0.78rem;
+      color: #999;
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    .flow-loop {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .flow-loop-arrow {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.3);
+    }
+
+    .flow-loop-label {
+      font-size: 0.75rem;
+      color: #999;
+    }
+
+    @keyframes bounceIn {
+      0% { transform: scale(0.3); opacity: 0; }
+      50% { transform: scale(1.1); }
+      70% { transform: scale(0.95); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes celebrate {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(-10deg); }
+      75% { transform: rotate(10deg); }
+    }
+
+    .kid-card.passed .kid-emoji {
+      animation: celebrate 0.6s ease-in-out;
+    }
+
+    .complexity-section {
+      margin-top: 24px;
+      padding: 16px 20px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .complexity-section h3 {
+      font-size: 0.92rem;
+      color: #ffd93d;
+      margin-bottom: 10px;
+    }
+
+    .complexity-row {
+      display: flex;
+      gap: 30px;
+      flex-wrap: wrap;
+    }
+
+    .complexity-item {
+      font-size: 0.88rem;
+      color: #bbb;
+    }
+
+    .complexity-item strong {
+      color: #6bcb77;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🍬 拥有最多糖果的孩子</h1>
+    <p class="subtitle">LeetCode 1431 · Kids With the Greatest Number of Candies</p>
+
+    <!-- 题目描述 -->
+    <div class="problem-section">
+      <strong>题目：</strong>有 <code>n</code> 个有糖果的孩子。给你一个数组 <code>candies</code>，其中 <code>candies[i]</code> 代表第 <code>i</code> 个孩子拥有的糖果数目，和一个整数 <code>extraCandies</code> 表示你所有的额外糖果数量。<br><br>
+      返回一个布尔数组 <code>result</code>，如果把所有 <code>extraCandies</code> 给第 <code>i</code> 个孩子后，他会拥有所有孩子中 <strong>最多</strong> 的糖果，那么 <code>result[i]</code> 为 <code>true</code>，否则为 <code>false</code>。注意，允许有多个孩子同时拥有最多的糖果数目。
+    </div>
+
+    <!-- 快捷示例 -->
+    <div class="examples">
+      <button class="example-btn" onclick="loadExample([2,3,5,1,3], 3)">示例1: [2,3,5,1,3], extra=3</button>
+      <button class="example-btn" onclick="loadExample([4,2,1,1,2], 1)">示例2: [4,2,1,1,2], extra=1</button>
+      <button class="example-btn" onclick="loadExample([12,1,12], 10)">示例3: [12,1,12], extra=10</button>
+    </div>
+
+    <!-- 输入区 -->
+    <div class="input-section">
+      <div class="input-group">
+        <label>candies（逗号分隔）</label>
+        <input type="text" id="candiesInput" value="2,3,5,1,3" placeholder="如 2,3,5,1,3">
+      </div>
+      <div class="input-group">
+        <label>extraCandies</label>
+        <input type="text" id="extraInput" value="3" class="short" placeholder="如 3">
+      </div>
+      <button class="btn btn-run" onclick="runAuto()">▶ 自动演示</button>
+      <button class="btn btn-step" onclick="stepForward()">⏭ 单步</button>
+      <button class="btn btn-reset" onclick="resetViz()">↺ 重置</button>
+      <div class="speed-control">
+        <label>速度</label>
+        <input type="range" id="speedRange" min="1" max="10" value="5">
+      </div>
+    </div>
+
+    <!-- 核心思路 -->
+    <div class="idea-section">
+      <h2>💡 核心思路</h2>
+      <div class="idea-steps">
+        <div class="idea-card">
+          <h3 style="color:#ff6b6b;">① 找到当前最大值</h3>
+          <p>遍历 <code>candies</code> 数组，找到所有孩子中糖果数的最大值 <code>maxCandy</code>。这是判断的基准线。</p>
+        </div>
+        <div class="idea-card">
+          <h3 style="color:#ffd93d;">② 逐个孩子判断</h3>
+          <p>对每个孩子，计算 <code>candies[i] + extraCandies</code>，如果结果 <code>≥ maxCandy</code>，则为 <code>true</code>。</p>
+        </div>
+        <div class="idea-card">
+          <h3 style="color:#6bcb77;">③ 收集结果</h3>
+          <p>将每个孩子的判断结果收集到数组中返回。可以用 <code>map()</code> 一行搞定。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 代码区 -->
+    <div class="code-section">
+      <h2>💻 JavaScript 代码</h2>
+      <div class="code-block">
+        <div class="code-line" data-line="0"><span class="keyword">function</span> <span class="func">kidsWithCandies</span>(<span class="variable">candies</span>, <span class="variable">extraCandies</span>) {</div>
+        <div class="code-line" data-line="1">  <span class="comment">// Step 1: find the current maximum</span></div>
+        <div class="code-line" data-line="2">  <span class="keyword">const</span> <span class="variable">maxCandy</span> = Math.<span class="func">max</span>(...<span class="variable">candies</span>);</div>
+        <div class="code-line" data-line="3"></div>
+        <div class="code-line" data-line="4">  <span class="comment">// Step 2: check each kid</span></div>
+        <div class="code-line" data-line="5">  <span class="keyword">return</span> <span class="variable">candies</span>.<span class="func">map</span>(<span class="variable">c</span> <span class="operator">=></span> <span class="variable">c</span> + <span class="variable">extraCandies</span> <span class="operator">>=</span> <span class="variable">maxCandy</span>);</div>
+        <div class="code-line" data-line="6">}</div>
+      </div>
+      <div class="complexity-section">
+        <h3>⏱ 复杂度分析</h3>
+        <div class="complexity-row">
+          <div class="complexity-item">时间复杂度：<strong>O(n)</strong> — 遍历两次数组</div>
+          <div class="complexity-item">空间复杂度：<strong>O(n)</strong> — 存储结果数组</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 可视化区 -->
+    <div class="viz-section">
+      <h2>🎨 动画图解</h2>
+
+      <!-- 柱状图 -->
+      <div class="max-bar-section" id="barSection">
+        <div class="max-bar-title" id="barTitle">糖果数量柱状图</div>
+        <div class="bar-container" id="barContainer"></div>
+      </div>
+
+      <!-- 孩子卡片 -->
+      <div class="kids-row" id="kidsRow"></div>
+
+      <!-- 比较面板 -->
+      <div class="compare-panel" id="comparePanel">
+        <div class="compare-title" id="compareTitle">等待开始...</div>
+        <div class="compare-formula" id="compareFormula"></div>
+      </div>
+
+      <!-- 结果数组 -->
+      <div class="result-array-section">
+        <div class="result-array-title">📦 结果数组 result</div>
+        <div class="result-array" id="resultArray"></div>
+      </div>
+
+      <!-- 步骤信息 -->
+      <div class="step-info" id="stepInfo">
+        点击 <span class="hl-yellow">自动演示</span> 或 <span class="hl-yellow">单步</span> 开始可视化。
+      </div>
+    </div>
+
+    <!-- 流程图 -->
+    <div class="flow-section">
+      <h2>📊 算法流程图</h2>
+      <div class="flowchart">
+        <div class="flow-node start" id="flow-start">开始：输入 candies, extraCandies</div>
+        <div class="flow-arrow"></div>
+        <div class="flow-node process" id="flow-max">求最大值 maxCandy = Math.max(...candies)</div>
+        <div class="flow-arrow"></div>
+        <div class="flow-node process" id="flow-loop">遍历每个孩子 i = 0, 1, 2, ...</div>
+        <div class="flow-arrow"></div>
+        <div class="flow-node decision" id="flow-check">candies[i] + extraCandies ≥ maxCandy ?</div>
+        <div class="flow-arrow"></div>
+        <div class="flow-branch">
+          <div class="flow-branch-item">
+            <div class="flow-branch-label">✅ 是</div>
+            <div class="flow-node process" style="border-color:rgba(107,203,119,0.4);background:rgba(107,203,119,0.1);" id="flow-true">result[i] = true</div>
+          </div>
+          <div class="flow-branch-item">
+            <div class="flow-branch-label">❌ 否</div>
+            <div class="flow-node process" style="border-color:rgba(255,107,107,0.35);background:rgba(255,107,107,0.08);" id="flow-false">result[i] = false</div>
+          </div>
+        </div>
+        <div class="flow-arrow"></div>
+        <div class="flow-node decision" id="flow-next">还有下一个孩子？</div>
+        <div class="flow-arrow"></div>
+        <div class="flow-branch">
+          <div class="flow-branch-item">
+            <div class="flow-branch-label">是 → 回到遍历</div>
+            <div class="flow-node process" style="font-size:0.8rem;" id="flow-continue">i++，继续循环</div>
+          </div>
+          <div class="flow-branch-item">
+            <div class="flow-branch-label">否 → 结束</div>
+            <div class="flow-node end-node" id="flow-end">返回 result ✅</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // === Core Algorithm ===
+    function kidsWithCandies(candies, extraCandies) {
+      const maxCandy = Math.max(...candies);
+      return candies.map(c => c + extraCandies >= maxCandy);
+    }
+
+    // === State ===
+    let candies = [];
+    let extraCandies = 0;
+    let steps = [];
+    let currentStep = -1;
+    let autoTimer = null;
+    let isPlaying = false;
+
+    const kidEmojis = ['👦', '👧', '👶', '🧒', '👦🏻', '👧🏻', '🧒🏻', '👶🏻', '👦🏽', '👧🏽'];
+
+    function loadExample(arr, extra) {
+      document.getElementById('candiesInput').value = arr.join(',');
+      document.getElementById('extraInput').value = extra;
+      resetViz();
+    }
+
+    // === Generate Steps ===
+    function generateSteps(c, extra) {
+      const arr = [];
+      const maxCandy = Math.max(...c);
+
+      // Step 0: init
+      arr.push({
+        type: 'init',
+        codeLine: 0,
+        flowNode: 'flow-start',
+        info: `输入 <span class="hl-yellow">candies = [${c.join(', ')}]</span>，<span class="hl-red">extraCandies = ${extra}</span>，共 ${c.length} 个孩子`
+      });
+
+      // Step 1: find max
+      arr.push({
+        type: 'find-max',
+        maxCandy,
+        codeLine: 2,
+        flowNode: 'flow-max',
+        info: `遍历数组找最大值：<span class="hl-red">maxCandy = Math.max(${c.join(', ')}) = ${maxCandy}</span>，这是判断的基准线`
+      });
+
+      // Step 2~N+1: check each kid
+      for (let i = 0; i < c.length; i++) {
+        const total = c[i] + extra;
+        const pass = total >= maxCandy;
+        arr.push({
+          type: 'check-kid',
+          kidIndex: i,
+          candy: c[i],
+          extra,
+          total,
+          maxCandy,
+          pass,
+          codeLine: 5,
+          flowNode: pass ? 'flow-true' : 'flow-false',
+          info: `孩子${i + 1}：<span class="hl-yellow">${c[i]}</span> + <span class="hl-red">${extra}</span> = <span class="hl-green">${total}</span>，${total} ${pass ? '≥' : '<'} ${maxCandy} → <span class="${pass ? 'hl-green' : 'hl-red'}">${pass ? 'true ✅ 可以成为最多' : 'false ❌ 还是不够'}</span>`
+        });
+      }
+
+      // Final step
+      const result = c.map(v => v + extra >= maxCandy);
+      arr.push({
+        type: 'result',
+        result,
+        codeLine: 5,
+        flowNode: 'flow-end',
+        info: `🎉 所有孩子判断完毕！最终结果：<span class="hl-green">[${result.join(', ')}]</span>`
+      });
+
+      return arr;
+    }
+
+    // === Render ===
+    function renderKids() {
+      const row = document.getElementById('kidsRow');
+      row.innerHTML = '';
+      for (let i = 0; i < candies.length; i++) {
+        const card = document.createElement('div');
+        card.className = 'kid-card';
+        card.id = `kid-${i}`;
+        card.innerHTML = `
+          <span class="kid-emoji">${kidEmojis[i % kidEmojis.length]}</span>
+          <div class="kid-label">孩子 ${i + 1}</div>
+          <div class="kid-candies" id="kid-candies-${i}">${candies[i]}</div>
+          <div class="kid-candies-label">颗糖果</div>
+          <div class="extra-badge" id="kid-extra-${i}">+${extraCandies}</div>
+          <div class="total-display" id="kid-total-${i}">= <span class="total-value" id="kid-total-val-${i}"></span></div>
+          <div class="result-badge" id="kid-result-${i}"></div>
+        `;
+        row.appendChild(card);
+      }
+    }
+
+    function renderBars(maxCandy, highlightIdx, showExtra) {
+      const container = document.getElementById('barContainer');
+      container.innerHTML = '';
+      const maxVal = Math.max(...candies) + extraCandies + 1;
+
+      for (let i = 0; i < candies.length; i++) {
+        const item = document.createElement('div');
+        item.className = 'bar-item';
+
+        const baseH = (candies[i] / maxVal) * 120;
+        const extraH = (extraCandies / maxVal) * 120;
+        const isCurrentMax = candies[i] === maxCandy;
+
+        if (showExtra && i === highlightIdx) {
+          const total = candies[i] + extraCandies;
+          item.innerHTML = `
+            <div class="bar-value" style="color:#6bcb77;">${total}</div>
+            <div class="bar-fill with-extra" style="height:${baseH + extraH}px;position:relative;">
+              ${isCurrentMax ? '' : ''}
+            </div>
+            <div class="bar-label">孩子${i + 1}</div>
+          `;
+        } else {
+          item.innerHTML = `
+            <div class="bar-value">${candies[i]}</div>
+            <div class="bar-fill normal ${isCurrentMax ? 'is-max' : ''}" style="height:${baseH}px;position:relative;">
+              ${isCurrentMax && highlightIdx === -1 ? `<div class="max-line"><div class="max-line-label">maxCandy=${maxCandy}</div></div>` : ''}
+            </div>
+            <div class="bar-label">孩子${i + 1}</div>
+          `;
+        }
+        container.appendChild(item);
+      }
+    }
+
+    function renderResultArray(results) {
+      const el = document.getElementById('resultArray');
+      el.innerHTML = '<span class="result-bracket">[</span>';
+      for (let i = 0; i < candies.length; i++) {
+        if (i > 0) el.innerHTML += '<span class="result-comma">,</span>';
+        const val = results[i];
+        const cls = val === true ? 'true-val' : val === false ? 'false-val' : '';
+        const txt = val === null ? '?' : val.toString();
+        el.innerHTML += `<span class="result-item ${cls}" id="result-${i}">${txt}</span>`;
+      }
+      el.innerHTML += '<span class="result-bracket">]</span>';
+    }
+
+    function clearHighlights() {
+      document.querySelectorAll('.kid-card').forEach(el => {
+        el.classList.remove('checking', 'passed', 'failed');
+      });
+      document.querySelectorAll('.code-line').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.flow-node').forEach(el => el.classList.remove('active-flow'));
+    }
+
+    function renderStep(idx) {
+      if (idx < 0 || idx >= steps.length) return;
+      const step = steps[idx];
+
+      // Clear only code/flow highlights, keep kid states from previous steps
+      document.querySelectorAll('.code-line').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.flow-node').forEach(el => el.classList.remove('active-flow'));
+      document.querySelectorAll('.kid-card').forEach(el => el.classList.remove('checking'));
+
+      // Highlight code
+      const cl = document.querySelector(`.code-line[data-line="${step.codeLine}"]`);
+      if (cl) cl.classList.add('active');
+
+      // Highlight flow
+      const fn = document.getElementById(step.flowNode);
+      if (fn) fn.classList.add('active-flow');
+
+      // Step info
+      document.getElementById('stepInfo').innerHTML = `<strong>步骤 ${idx + 1}/${steps.length}：</strong>${step.info}`;
+
+      const compareTitle = document.getElementById('compareTitle');
+      const compareFormula = document.getElementById('compareFormula');
+
+      switch (step.type) {
+        case 'init': {
+          renderBars(0, -2, false);
+          const nullResults = candies.map(() => null);
+          renderResultArray(nullResults);
+          compareTitle.textContent = '准备开始分析...';
+          compareFormula.innerHTML = '';
+          break;
+        }
+
+        case 'find-max': {
+          renderBars(step.maxCandy, -1, false);
+          const nullResults = candies.map(() => null);
+          renderResultArray(nullResults);
+          compareTitle.textContent = '找到最大值';
+          compareFormula.innerHTML = `
+            <span>maxCandy</span>
+            <span class="op">=</span>
+            <span class="max-val">Math.max(${candies.join(', ')}) = ${step.maxCandy}</span>
+          `;
+          break;
+        }
+
+        case 'check-kid': {
+          const i = step.kidIndex;
+          renderBars(step.maxCandy, i, true);
+
+          // Collect results up to this point
+          const results = candies.map((_, idx) => {
+            if (idx < i) {
+              const prevStep = steps.find(s => s.type === 'check-kid' && s.kidIndex === idx);
+              return prevStep ? prevStep.pass : null;
+            } else if (idx === i) {
+              return step.pass;
+            }
+            return null;
+          });
+          renderResultArray(results);
+
+          // Update kid cards
+          for (let j = 0; j <= i; j++) {
+            const card = document.getElementById(`kid-${j}`);
+            const prevStep = steps.find(s => s.type === 'check-kid' && s.kidIndex === j);
+            if (j < i && prevStep) {
+              card.classList.remove('checking');
+              card.classList.add(prevStep.pass ? 'passed' : 'failed');
+            }
+          }
+
+          // Current kid
+          const card = document.getElementById(`kid-${i}`);
+          card.classList.add('checking');
+
+          // Show extra badge
+          const badge = document.getElementById(`kid-extra-${i}`);
+          badge.classList.add('show');
+
+          // Show total
+          const totalEl = document.getElementById(`kid-total-${i}`);
+          totalEl.classList.add('show');
+          document.getElementById(`kid-total-val-${i}`).textContent = step.total;
+
+          // Show result badge
+          const resultBadge = document.getElementById(`kid-result-${i}`);
+          resultBadge.classList.add('show');
+          resultBadge.classList.add(step.pass ? 'pass' : 'fail');
+          resultBadge.textContent = step.pass ? '✅ true' : '❌ false';
+
+          // After brief delay, set card to passed/failed
+          setTimeout(() => {
+            card.classList.remove('checking');
+            card.classList.add(step.pass ? 'passed' : 'failed');
+          }, 300);
+
+          // Compare formula
+          compareTitle.textContent = `判断孩子 ${i + 1}`;
+          compareFormula.innerHTML = `
+            <span class="candy-val">${step.candy}</span>
+            <span class="op">+</span>
+            <span class="extra-val">${step.extra}</span>
+            <span class="op">=</span>
+            <span class="total-val">${step.total}</span>
+            <span class="op">${step.pass ? '≥' : '<'}</span>
+            <span class="max-val">${step.maxCandy}</span>
+            <span class="op">→</span>
+            <span class="result-text ${step.pass ? 'yes' : 'no'}">${step.pass ? 'true ✅' : 'false ❌'}</span>
+          `;
+          break;
+        }
+
+        case 'result': {
+          renderResultArray(step.result);
+
+          // Set all kid cards final state
+          for (let i = 0; i < candies.length; i++) {
+            const card = document.getElementById(`kid-${i}`);
+            card.classList.remove('checking');
+            card.classList.add(step.result[i] ? 'passed' : 'failed');
+          }
+
+          renderBars(Math.max(...candies), -2, false);
+          compareTitle.textContent = '🎉 全部判断完毕！';
+          compareFormula.innerHTML = `<span style="color:#6bcb77;font-weight:700;">result = [${step.result.join(', ')}]</span>`;
+          break;
+        }
+      }
+    }
+
+    // === Controls ===
+    function parseInput() {
+      const cStr = document.getElementById('candiesInput').value.trim();
+      const eStr = document.getElementById('extraInput').value.trim();
+      candies = cStr.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
+      extraCandies = parseInt(eStr) || 0;
+      if (candies.length === 0) {
+        candies = [2, 3, 5, 1, 3];
+        extraCandies = 3;
+      }
+    }
+
+    function initViz() {
+      parseInput();
+      steps = generateSteps(candies, extraCandies);
+      currentStep = -1;
+      renderKids();
+      renderBars(0, -2, false);
+      renderResultArray(candies.map(() => null));
+      clearHighlights();
+      document.getElementById('compareTitle').textContent = '等待开始...';
+      document.getElementById('compareFormula').innerHTML = '';
+      document.getElementById('stepInfo').innerHTML = `点击 <span class="hl-yellow">自动演示</span> 或 <span class="hl-yellow">单步</span> 开始。candies=[${candies.join(',')}], extraCandies=${extraCandies}`;
+    }
+
+    function stepForward() {
+      if (currentStep === -1) initViz();
+      if (currentStep < steps.length - 1) {
+        currentStep++;
+        renderStep(currentStep);
+      }
+    }
+
+    function getDelay() {
+      const v = document.getElementById('speedRange').value;
+      return 1600 - v * 140;
+    }
+
+    function runAuto() {
+      if (isPlaying) {
+        clearTimeout(autoTimer);
+        isPlaying = false;
+        document.querySelector('.btn-run').textContent = '▶ 自动演示';
+        return;
+      }
+
+      if (currentStep === -1 || currentStep >= steps.length - 1) {
+        initViz();
+      }
+
+      isPlaying = true;
+      document.querySelector('.btn-run').textContent = '⏸ 暂停';
+
+      function tick() {
+        if (currentStep < steps.length - 1) {
+          currentStep++;
+          renderStep(currentStep);
+          autoTimer = setTimeout(tick, getDelay());
+        } else {
+          isPlaying = false;
+          document.querySelector('.btn-run').textContent = '▶ 自动演示';
+        }
+      }
+      tick();
+    }
+
+    function resetViz() {
+      clearTimeout(autoTimer);
+      isPlaying = false;
+      document.querySelector('.btn-run').textContent = '▶ 自动演示';
+      initViz();
+    }
+
+    // Init on load
+    window.addEventListener('DOMContentLoaded', initViz);
+  </script>
+</body>
+</html>
