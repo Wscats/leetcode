@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>反转字符串中的单词 - 交互式图解</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: linear-gradient(135deg, #0a0f1e 0%, #121d34 50%, #0d1926 100%);
+      min-height: 100vh;
+      color: #e0e0e0;
+      padding: 30px 20px;
+    }
+
+    .container { max-width: 1080px; margin: 0 auto; }
+
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 6px;
+      background: linear-gradient(90deg, #a18cd1, #fbc2eb, #f6d365, #fda085);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle { text-align: center; color: #6d7f94; font-size: 0.92rem; margin-bottom: 32px; }
+
+    /* ===== Section ===== */
+    .section {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      padding: 24px 28px;
+      margin-bottom: 22px;
+      backdrop-filter: blur(4px);
+    }
+
+    .section h2 {
+      font-size: 1.12rem;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ===== Problem ===== */
+    .problem { line-height: 2; font-size: 0.93rem; color: #c0c8d2; }
+    .problem strong { color: #fbc2eb; }
+    .problem code {
+      background: rgba(251,194,235,0.1);
+      padding: 2px 8px;
+      border-radius: 5px;
+      color: #fbc2eb;
+      font-size: 0.85rem;
+      font-family: 'Fira Code', Consolas, monospace;
+    }
+
+    .ex-box {
+      background: rgba(255,255,255,0.025);
+      border-left: 3px solid #a18cd1;
+      border-radius: 0 10px 10px 0;
+      padding: 14px 18px;
+      margin-top: 12px;
+      margin-bottom: 10px;
+    }
+
+    .ex-box p {
+      font-size: 0.86rem;
+      line-height: 1.85;
+      color: #a0acb8;
+      font-family: 'Fira Code', Consolas, monospace;
+    }
+
+    .ex-box .hl { color: #a18cd1; font-weight: 600; }
+
+    /* ===== Ideas ===== */
+    .idea-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+    }
+
+    .idea-card {
+      background: rgba(255,255,255,0.02);
+      border-radius: 12px;
+      padding: 18px;
+      border-left: 3px solid;
+      transition: transform 0.22s;
+    }
+
+    .idea-card:hover { transform: translateY(-3px); }
+    .idea-card:nth-child(1) { border-color: #f6d365; }
+    .idea-card:nth-child(2) { border-color: #a18cd1; }
+    .idea-card:nth-child(3) { border-color: #fda085; }
+    .idea-card:nth-child(4) { border-color: #84fab0; }
+
+    .idea-card h3 { font-size: 0.92rem; margin-bottom: 8px; }
+    .idea-card p { font-size: 0.82rem; color: #96a3b1; line-height: 1.75; }
+    .idea-card code {
+      background: rgba(255,255,255,0.06);
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 0.78rem;
+      font-family: 'Fira Code', Consolas, monospace;
+    }
+
+    /* ===== Controls ===== */
+    .examples-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 14px; }
+
+    .ex-btn {
+      padding: 7px 16px;
+      border: 1.5px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      background: rgba(255,255,255,0.025);
+      color: #90a0b2;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Fira Code', Consolas, monospace;
+      max-width: 280px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .ex-btn:hover { border-color: #a18cd1; color: #a18cd1; background: rgba(161,140,209,0.06); }
+
+    .input-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      justify-content: center;
+      margin-bottom: 14px;
+    }
+
+    .input-group { display: flex; flex-direction: column; gap: 5px; }
+    .input-group label { font-size: 0.76rem; color: #7a8d9f; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    .input-group input {
+      padding: 10px 16px;
+      border: 2px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.04);
+      color: #fff;
+      font-size: 0.95rem;
+      outline: none;
+      font-family: 'Fira Code', Consolas, monospace;
+      transition: border-color 0.3s;
+      width: 420px;
+    }
+
+    .input-group input:focus { border-color: #a18cd1; }
+
+    .btn {
+      padding: 10px 22px;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.22s;
+      white-space: nowrap;
+    }
+
+    .btn:hover { transform: translateY(-2px); }
+
+    .btn-run { background: linear-gradient(135deg, #a18cd1, #fbc2eb); color: #0a1628; }
+    .btn-run:hover { box-shadow: 0 6px 20px rgba(161,140,209,0.35); }
+
+    .btn-step { background: linear-gradient(135deg, #f6d365, #fda085); color: #0a1628; }
+    .btn-step:hover { box-shadow: 0 6px 20px rgba(246,211,101,0.35); }
+
+    .btn-reset { background: rgba(255,255,255,0.06); color: #7a8d9f; }
+    .btn-reset:hover { background: rgba(255,255,255,0.1); color: #bbb; }
+
+    .speed-ctrl { display: flex; align-items: center; gap: 6px; }
+    .speed-ctrl label { font-size: 0.76rem; color: #7a8d9f; }
+    .speed-ctrl input[type="range"] { width: 88px; accent-color: #a18cd1; }
+
+    /* ===== Code ===== */
+    .code-block {
+      font-family: 'Fira Code', Consolas, monospace;
+      font-size: 0.84rem;
+      line-height: 1.88;
+      overflow-x: auto;
+    }
+
+    .code-line {
+      padding: 2px 12px;
+      border-radius: 4px;
+      transition: background 0.35s, border-color 0.35s;
+      white-space: pre;
+      border-left: 3px solid transparent;
+    }
+
+    .code-line.active {
+      background: rgba(161,140,209,0.13);
+      border-left-color: #a18cd1;
+    }
+
+    .kw { color: #c678dd; }
+    .fn { color: #61afef; }
+    .cm { color: #5c6370; font-style: italic; }
+    .vr { color: #e5c07b; }
+    .op { color: #56b6c2; }
+    .st { color: #98c379; }
+    .nm { color: #d19a66; }
+
+    .complexity {
+      margin-top: 18px;
+      padding: 14px 18px;
+      background: rgba(255,255,255,0.02);
+      border-radius: 10px;
+      display: flex;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+
+    .complexity span { font-size: 0.85rem; color: #96a3b1; }
+    .complexity strong { color: #a18cd1; }
+
+    /* ===== Visualization ===== */
+    .viz-stage-label {
+      text-align: center;
+      font-size: 0.92rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+      padding: 10px 20px;
+      border-radius: 10px;
+      display: inline-block;
+    }
+
+    .viz-stage-wrap { text-align: center; margin-bottom: 16px; }
+
+    /* Original string display */
+    .string-display {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0;
+      margin: 16px 0;
+      min-height: 56px;
+      align-items: center;
+    }
+
+    .char-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: all 0.4s;
+    }
+
+    .char-cell .c-idx {
+      font-size: 0.6rem;
+      color: #3a4a5a;
+      margin-bottom: 2px;
+      font-family: 'Fira Code', Consolas, monospace;
+    }
+
+    .char-cell .c-box {
+      width: 34px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1.5px solid rgba(255,255,255,0.08);
+      border-radius: 6px;
+      font-size: 1.15rem;
+      font-family: 'Fira Code', Consolas, monospace;
+      font-weight: 600;
+      transition: all 0.4s;
+      background: rgba(255,255,255,0.015);
+    }
+
+    .char-cell.space-char .c-box {
+      background: rgba(246,211,101,0.06);
+      border-color: rgba(246,211,101,0.2);
+      color: #f6d365;
+      font-size: 0.7rem;
+    }
+
+    .char-cell.trimmed .c-box {
+      background: rgba(253,100,100,0.1);
+      border-color: rgba(253,100,100,0.3);
+      text-decoration: line-through;
+      opacity: 0.5;
+    }
+
+    .char-cell.highlight .c-box {
+      border-color: #a18cd1;
+      box-shadow: 0 0 10px rgba(161,140,209,0.3);
+    }
+
+    /* Word blocks */
+    .word-blocks {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin: 20px 0;
+      min-height: 64px;
+      align-items: center;
+      transition: all 0.5s;
+    }
+
+    .word-block {
+      padding: 14px 22px;
+      border-radius: 14px;
+      font-size: 1.15rem;
+      font-weight: 700;
+      font-family: 'Fira Code', Consolas, monospace;
+      letter-spacing: 1px;
+      transition: all 0.5s;
+      position: relative;
+    }
+
+    .word-block .w-idx {
+      position: absolute;
+      top: -8px;
+      right: -6px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      font-size: 0.65rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.6);
+      border: 1.5px solid;
+    }
+
+    /* Color palette for word blocks */
+    .wb-0 { background: rgba(161,140,209,0.12); border: 2px solid rgba(161,140,209,0.4); color: #c9b8f0; }
+    .wb-0 .w-idx { border-color: #a18cd1; color: #a18cd1; }
+
+    .wb-1 { background: rgba(246,211,101,0.1); border: 2px solid rgba(246,211,101,0.35); color: #f6d365; }
+    .wb-1 .w-idx { border-color: #f6d365; color: #f6d365; }
+
+    .wb-2 { background: rgba(132,250,176,0.08); border: 2px solid rgba(132,250,176,0.3); color: #84fab0; }
+    .wb-2 .w-idx { border-color: #84fab0; color: #84fab0; }
+
+    .wb-3 { background: rgba(253,160,133,0.1); border: 2px solid rgba(253,160,133,0.35); color: #fda085; }
+    .wb-3 .w-idx { border-color: #fda085; color: #fda085; }
+
+    .wb-4 { background: rgba(251,194,235,0.1); border: 2px solid rgba(251,194,235,0.35); color: #fbc2eb; }
+    .wb-4 .w-idx { border-color: #fbc2eb; color: #fbc2eb; }
+
+    .wb-5 { background: rgba(97,175,239,0.1); border: 2px solid rgba(97,175,239,0.3); color: #61afef; }
+    .wb-5 .w-idx { border-color: #61afef; color: #61afef; }
+
+    .word-block.swapping {
+      animation: blockPulse 0.6s ease-in-out;
+    }
+
+    @keyframes blockPulse {
+      0% { transform: scale(1); }
+      30% { transform: scale(1.12) translateY(-6px); }
+      60% { transform: scale(0.96); }
+      100% { transform: scale(1); }
+    }
+
+    .word-block.done-block {
+      box-shadow: 0 0 18px rgba(132,250,176,0.3);
+    }
+
+    /* Arrow between words */
+    .arrow-sep {
+      font-size: 1.2rem;
+      color: #4a5a6a;
+      display: flex;
+      align-items: center;
+    }
+
+    /* Reverse animation area */
+    .reverse-arrow {
+      text-align: center;
+      font-size: 2rem;
+      margin: 10px 0;
+      opacity: 0;
+      transition: opacity 0.4s;
+      color: #fda085;
+    }
+
+    .reverse-arrow.show { opacity: 1; }
+
+    /* Join result */
+    .join-result {
+      text-align: center;
+      font-size: 1.3rem;
+      font-weight: 800;
+      font-family: 'Fira Code', Consolas, monospace;
+      letter-spacing: 2px;
+      padding: 18px 30px;
+      border-radius: 14px;
+      display: none;
+      margin: 16px auto;
+      max-width: fit-content;
+      background: rgba(132,250,176,0.08);
+      border: 2px solid rgba(132,250,176,0.3);
+      color: #84fab0;
+    }
+
+    /* Step info */
+    .step-info {
+      padding: 14px 20px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 10px;
+      font-size: 0.9rem;
+      color: #bcc6d0;
+      line-height: 1.8;
+      min-height: 52px;
+      margin-top: 16px;
+    }
+
+    .hl-p { color: #a18cd1; font-weight: 600; }
+    .hl-y { color: #f6d365; font-weight: 600; }
+    .hl-g { color: #84fab0; font-weight: 600; }
+    .hl-o { color: #fda085; font-weight: 600; }
+    .hl-k { color: #fbc2eb; font-weight: 600; }
+    .hl-r { color: #f66; font-weight: 600; }
+
+    /* Result banner */
+    .result-banner {
+      margin-top: 16px;
+      padding: 20px 28px;
+      border-radius: 14px;
+      text-align: center;
+      display: none;
+      background: rgba(132,250,176,0.08);
+      border: 2px solid rgba(132,250,176,0.28);
+    }
+
+    .result-banner .r-label { font-size: 0.82rem; color: #7a8d9f; margin-bottom: 6px; }
+
+    .result-banner .r-val {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #84fab0;
+      font-family: 'Fira Code', Consolas, monospace;
+      letter-spacing: 2px;
+    }
+
+    .result-banner .r-detail { font-size: 0.84rem; color: #7a8d9f; margin-top: 8px; }
+
+    /* ===== Flowchart ===== */
+    .flowchart { display: flex; flex-direction: column; align-items: center; gap: 0; }
+
+    .fl-node {
+      padding: 12px 26px;
+      border-radius: 12px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      text-align: center;
+      max-width: 440px;
+      transition: all 0.35s;
+    }
+
+    .fl-node.start { background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 28px; }
+    .fl-node.process { background: rgba(161,140,209,0.08); border: 2px solid rgba(161,140,209,0.2); }
+    .fl-node.action { background: rgba(132,250,176,0.06); border: 2px solid rgba(132,250,176,0.2); }
+    .fl-node.decision { background: rgba(246,211,101,0.06); border: 2px solid rgba(246,211,101,0.2); }
+    .fl-node.end { background: linear-gradient(135deg, #11998e, #38ef7d); border-radius: 28px; color: #000; }
+
+    .fl-node.active-fl {
+      box-shadow: 0 0 22px rgba(251,194,235,0.45);
+      border-color: #fbc2eb !important;
+    }
+
+    .fl-arrow {
+      width: 2px;
+      height: 18px;
+      background: rgba(255,255,255,0.1);
+      position: relative;
+    }
+
+    .fl-arrow::after {
+      content: '▼';
+      position: absolute;
+      bottom: -9px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.55rem;
+      color: rgba(255,255,255,0.18);
+    }
+
+    /* ===== Legends ===== */
+    .legend-row {
+      display: flex;
+      gap: 18px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: #7a8d9f; }
+
+    .legend-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 4px;
+    }
+
+    .ld-space { background: rgba(246,211,101,0.15); border: 1.5px solid rgba(246,211,101,0.4); }
+    .ld-trim { background: rgba(253,100,100,0.15); border: 1.5px solid rgba(253,100,100,0.4); }
+    .ld-word { background: rgba(161,140,209,0.15); border: 1.5px solid rgba(161,140,209,0.4); }
+    .ld-rev { background: rgba(253,160,133,0.15); border: 1.5px solid rgba(253,160,133,0.4); }
+    .ld-done { background: rgba(132,250,176,0.15); border: 1.5px solid rgba(132,250,176,0.4); }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <h1>📝 反转字符串中的单词</h1>
+  <p class="subtitle">LeetCode 151 · Reverse Words in a String</p>
+
+  <!-- Problem -->
+  <div class="section">
+    <h2 style="color:#fbc2eb">📋 题目描述</h2>
+    <div class="problem">
+      给你一个字符串 <code>s</code>，请你反转字符串中 <strong>单词</strong> 的顺序。<br><br>
+      <strong>单词</strong> 是由非空格字符组成的字符串，<code>s</code> 中使用至少一个空格将字符串中的单词分隔开。<br>
+      返回的字符串中，单词间应当仅用 <strong>单个空格</strong> 分隔，且不包含任何 <strong>额外的空格</strong>。<br><br>
+      <strong>约束：</strong>1 ≤ s.length ≤ 10⁴，<code>s</code> 包含英文大小写字母、数字和空格 <code>' '</code>，至少存在一个单词。
+      <div class="ex-box">
+        <p><span class="hl">示例 1：</span>输入 s = "the sky is blue" → 输出 "blue is sky the"</p>
+        <p><span class="hl">示例 2：</span>输入 s = "&nbsp;&nbsp;hello world&nbsp;&nbsp;" → 输出 "world hello"</p>
+        <p><span class="hl">示例 3：</span>输入 s = "a good&nbsp;&nbsp;&nbsp;example" → 输出 "example good a"</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ideas -->
+  <div class="section">
+    <h2 style="color:#f6d365">💡 核心思路 — 分割 + 反转 + 拼接</h2>
+    <div class="idea-grid">
+      <div class="idea-card">
+        <h3 style="color:#f6d365">① 去除多余空格</h3>
+        <p>使用 <code>trim()</code> 去除首尾空格，为后续分割做准备。</p>
+      </div>
+      <div class="idea-card">
+        <h3 style="color:#a18cd1">② 按空格分割</h3>
+        <p>用 <code>split(/\s+/)</code> 正则分割，自动处理多个连续空格，得到单词数组。</p>
+      </div>
+      <div class="idea-card">
+        <h3 style="color:#fda085">③ 反转数组</h3>
+        <p>调用 <code>reverse()</code> 将单词数组顺序反转，即可实现单词倒序。</p>
+      </div>
+      <div class="idea-card">
+        <h3 style="color:#84fab0">④ 拼接结果</h3>
+        <p>使用 <code>join(' ')</code> 用单个空格连接所有单词，返回最终结果。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="section">
+    <h2 style="color:#a18cd1">🎮 交互控制</h2>
+    <div class="examples-row">
+      <button class="ex-btn" onclick="loadEx('the sky is blue')">示例1: "the sky is blue"</button>
+      <button class="ex-btn" onclick="loadEx('  hello world  ')">示例2: "  hello world  "</button>
+      <button class="ex-btn" onclick="loadEx('a good   example')">示例3: "a good   example"</button>
+      <button class="ex-btn" onclick="loadEx('  Bob    Loves  Alice   ')">多空格混合</button>
+      <button class="ex-btn" onclick="loadEx('Alice does not even like bob')">长句子</button>
+      <button class="ex-btn" onclick="loadEx('single')">单词: "single"</button>
+    </div>
+    <div class="input-row">
+      <div class="input-group">
+        <label>输入字符串 s</label>
+        <input type="text" id="sInput" value="the sky is blue" placeholder="如: the sky is blue">
+      </div>
+      <button class="btn btn-run" onclick="runAuto()">▶ 自动演示</button>
+      <button class="btn btn-step" onclick="stepForward()">⏭ 单步</button>
+      <button class="btn btn-reset" onclick="resetViz()">↺ 重置</button>
+      <div class="speed-ctrl">
+        <label>速度</label>
+        <input type="range" id="speedRange" min="1" max="10" value="5">
+      </div>
+    </div>
+  </div>
+
+  <!-- Code -->
+  <div class="section">
+    <h2 style="color:#84fab0">💻 JavaScript 代码</h2>
+    <div class="code-block">
+      <div class="code-line" data-line="0"><span class="kw">var</span> <span class="fn">reverseWords</span> = <span class="kw">function</span>(<span class="vr">s</span>) {</div>
+      <div class="code-line" data-line="1">  <span class="cm">// Step 1: trim leading/trailing spaces</span></div>
+      <div class="code-line" data-line="2">  <span class="vr">s</span> = <span class="vr">s</span>.<span class="fn">trim</span>();</div>
+      <div class="code-line" data-line="3">  <span class="cm">// Step 2: split by one or more spaces</span></div>
+      <div class="code-line" data-line="4">  <span class="kw">const</span> <span class="vr">words</span> = <span class="vr">s</span>.<span class="fn">split</span>(<span class="st">/\s+/</span>);</div>
+      <div class="code-line" data-line="5">  <span class="cm">// Step 3: reverse the array</span></div>
+      <div class="code-line" data-line="6">  <span class="vr">words</span>.<span class="fn">reverse</span>();</div>
+      <div class="code-line" data-line="7">  <span class="cm">// Step 4: join with single space</span></div>
+      <div class="code-line" data-line="8">  <span class="kw">return</span> <span class="vr">words</span>.<span class="fn">join</span>(<span class="st">' '</span>);</div>
+      <div class="code-line" data-line="9">};</div>
+    </div>
+    <div class="complexity">
+      <span>时间复杂度：<strong>O(n)</strong> — 遍历字符串一次</span>
+      <span>空间复杂度：<strong>O(n)</strong> — 存储单词数组</span>
+    </div>
+  </div>
+
+  <!-- Visualization -->
+  <div class="section">
+    <h2 style="color:#fda085">🎨 动画图解</h2>
+
+    <div class="legend-row">
+      <div class="legend-item"><div class="legend-dot ld-space"></div>空格字符</div>
+      <div class="legend-item"><div class="legend-dot ld-trim"></div>被去除的空格</div>
+      <div class="legend-item"><div class="legend-dot ld-word"></div>单词块</div>
+      <div class="legend-item"><div class="legend-dot ld-rev"></div>反转操作</div>
+      <div class="legend-item"><div class="legend-dot ld-done"></div>最终结果</div>
+    </div>
+
+    <!-- Stage 1: Original string -->
+    <div class="viz-stage-wrap">
+      <div class="viz-stage-label" id="stageLabel" style="background:rgba(161,140,209,0.1);border:1.5px solid rgba(161,140,209,0.3);color:#c9b8f0;">
+        原始字符串
+      </div>
+    </div>
+    <div class="string-display" id="charDisplay"></div>
+
+    <!-- Stage 2: Word blocks -->
+    <div class="reverse-arrow" id="reverseArrow">⟱ 反转单词顺序 ⟱</div>
+    <div class="word-blocks" id="wordBlocks"></div>
+
+    <!-- Stage 3: Result -->
+    <div class="join-result" id="joinResult"></div>
+
+    <!-- Step info -->
+    <div class="step-info" id="stepInfo">
+      点击 <span class="hl-p">自动演示</span> 或 <span class="hl-y">单步</span> 开始可视化。
+    </div>
+
+    <!-- Result banner -->
+    <div class="result-banner" id="resultBanner">
+      <div class="r-label">✅ 最终结果</div>
+      <div class="r-val" id="resultVal"></div>
+      <div class="r-detail" id="resultDetail"></div>
+    </div>
+  </div>
+
+  <!-- Flowchart -->
+  <div class="section">
+    <h2 style="color:#f6d365">📊 算法流程图</h2>
+    <div class="flowchart">
+      <div class="fl-node start" id="fl-start">开始：输入字符串 s</div>
+      <div class="fl-arrow"></div>
+      <div class="fl-node process" id="fl-trim">Step 1：s.trim() 去除首尾空格</div>
+      <div class="fl-arrow"></div>
+      <div class="fl-node process" id="fl-split">Step 2：s.split(/\s+/) 按空格分割成单词数组</div>
+      <div class="fl-arrow"></div>
+      <div class="fl-node decision" id="fl-check">单词数组 words = [w₁, w₂, ..., wₙ]</div>
+      <div class="fl-arrow"></div>
+      <div class="fl-node action" id="fl-reverse">Step 3：words.reverse() 反转数组顺序</div>
+      <div class="fl-arrow"></div>
+      <div class="fl-node action" id="fl-join">Step 4：words.join(' ') 用空格拼接</div>
+      <div class="fl-arrow"></div>
+      <div class="fl-node end" id="fl-end">返回结果 🎉</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ===== State =====
+  let steps = [];
+  let curStep = -1;
+  let autoTimer = null;
+  let playing = false;
+
+  const COLORS = ['wb-0','wb-1','wb-2','wb-3','wb-4','wb-5'];
+
+  function loadEx(str) {
+    document.getElementById('sInput').value = str;
+    resetViz();
+  }
+
+  // ===== Generate steps =====
+  function genSteps(s) {
+    const st = [];
+    const original = s;
+
+    // Step 0: show original
+    st.push({
+      type: 'original',
+      chars: s,
+      trimmedChars: null,
+      words: null,
+      wordsReversed: null,
+      result: null,
+      codeLine: 0,
+      flowId: 'fl-start',
+      info: `原始字符串："<span class="hl-k">${escHtml(s)}</span>"，长度 = ${s.length}。`
+    });
+
+    // Step 1: trim
+    const trimmed = s.trim();
+    const leadSpaces = s.length - s.trimStart().length;
+    const trailSpaces = s.length - s.trimEnd().length;
+    const trimInfo = [];
+    if (leadSpaces > 0) trimInfo.push(`前导 ${leadSpaces} 个空格`);
+    if (trailSpaces > 0) trimInfo.push(`尾随 ${trailSpaces} 个空格`);
+
+    st.push({
+      type: 'trim',
+      chars: s,
+      trimStart: leadSpaces,
+      trimEnd: s.length - trailSpaces,
+      trimmed: trimmed,
+      words: null,
+      wordsReversed: null,
+      result: null,
+      codeLine: 2,
+      flowId: 'fl-trim',
+      info: trimInfo.length > 0
+        ? `<span class="hl-y">trim()</span> 去除了 ${trimInfo.join(' 和 ')}。结果："<span class="hl-p">${escHtml(trimmed)}</span>"。`
+        : `<span class="hl-y">trim()</span>：首尾无多余空格，保持不变。`
+    });
+
+    // Step 2: split
+    const words = trimmed.split(/\s+/);
+    st.push({
+      type: 'split',
+      chars: s,
+      trimStart: leadSpaces,
+      trimEnd: s.length - trailSpaces,
+      words: [...words],
+      wordsReversed: null,
+      result: null,
+      codeLine: 4,
+      flowId: 'fl-split',
+      info: `<span class="hl-p">split(/\\s+/)</span> 按空格分割，得到 <span class="hl-y">${words.length}</span> 个单词：[${words.map(w => `"<span class="hl-k">${escHtml(w)}</span>"`).join(', ')}]。`
+    });
+
+    // Step 2.5: show the words array
+    st.push({
+      type: 'show-words',
+      words: [...words],
+      wordsReversed: null,
+      result: null,
+      codeLine: 4,
+      flowId: 'fl-check',
+      info: `单词数组已就绪：[${words.map((w, i) => `<span class="hl-k">${i}:"${escHtml(w)}"</span>`).join(', ')}]，准备反转。`
+    });
+
+    // Step 3: reverse — show the swap process
+    const wordsForReverse = [...words];
+    let left = 0, right = wordsForReverse.length - 1;
+
+    if (wordsForReverse.length > 1) {
+      while (left < right) {
+        // Before swap
+        st.push({
+          type: 'reverse-pair',
+          words: [...wordsForReverse],
+          swapL: left,
+          swapR: right,
+          phase: 'before',
+          wordsReversed: null,
+          result: null,
+          codeLine: 6,
+          flowId: 'fl-reverse',
+          info: `🔄 反转：交换位置 <span class="hl-p">${left}</span>（"<span class="hl-k">${escHtml(wordsForReverse[left])}</span>"）↔ 位置 <span class="hl-o">${right}</span>（"<span class="hl-k">${escHtml(wordsForReverse[right])}</span>"）。`
+        });
+
+        // Do swap
+        [wordsForReverse[left], wordsForReverse[right]] = [wordsForReverse[right], wordsForReverse[left]];
+
+        st.push({
+          type: 'reverse-pair',
+          words: [...wordsForReverse],
+          swapL: left,
+          swapR: right,
+          phase: 'after',
+          wordsReversed: null,
+          result: null,
+          codeLine: 6,
+          flowId: 'fl-reverse',
+          info: `✅ 交换完成！位置 ${left} → "<span class="hl-k">${escHtml(wordsForReverse[left])}</span>"，位置 ${right} → "<span class="hl-k">${escHtml(wordsForReverse[right])}</span>"。`
+        });
+
+        left++;
+        right--;
+      }
+    }
+
+    // Show reversed array
+    st.push({
+      type: 'reversed',
+      words: [...wordsForReverse],
+      wordsReversed: [...wordsForReverse],
+      result: null,
+      codeLine: 6,
+      flowId: 'fl-reverse',
+      info: `反转完成！单词数组：[${wordsForReverse.map(w => `"<span class="hl-g">${escHtml(w)}</span>"`).join(', ')}]。`
+    });
+
+    // Step 4: join
+    const result = wordsForReverse.join(' ');
+    st.push({
+      type: 'join',
+      words: [...wordsForReverse],
+      wordsReversed: [...wordsForReverse],
+      result: result,
+      codeLine: 8,
+      flowId: 'fl-join',
+      info: `<span class="hl-g">join(' ')</span> 用单个空格拼接 → "<span class="hl-g">${escHtml(result)}</span>"。`
+    });
+
+    // Done
+    st.push({
+      type: 'done',
+      words: [...wordsForReverse],
+      wordsReversed: [...wordsForReverse],
+      result: result,
+      original: original,
+      codeLine: 8,
+      flowId: 'fl-end',
+      info: `🎉 完成！"<span class="hl-k">${escHtml(original)}</span>" → "<span class="hl-g">${escHtml(result)}</span>"。`
+    });
+
+    return st;
+  }
+
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/ /g, '·');
+  }
+
+  // ===== Render char display =====
+  function renderChars(s, trimStart, trimEnd) {
+    const el = document.getElementById('charDisplay');
+    el.innerHTML = '';
+    for (let i = 0; i < s.length; i++) {
+      const ch = s[i];
+      const isSpace = ch === ' ';
+      const isTrimmed = (trimStart != null) && (i < trimStart || i >= trimEnd);
+      // check if it's an interior extra space
+      const cell = document.createElement('div');
+      let cls = 'char-cell';
+      if (isSpace) cls += ' space-char';
+      if (isTrimmed && isSpace) cls += ' trimmed';
+      cell.className = cls;
+      cell.innerHTML = `<div class="c-idx">${i}</div><div class="c-box">${isSpace ? '␣' : ch}</div>`;
+      el.appendChild(cell);
+    }
+  }
+
+  // ===== Render word blocks =====
+  function renderWordBlocks(words, opts = {}) {
+    const el = document.getElementById('wordBlocks');
+    el.innerHTML = '';
+    if (!words || words.length === 0) return;
+
+    words.forEach((w, i) => {
+      if (i > 0) {
+        const sep = document.createElement('div');
+        sep.className = 'arrow-sep';
+        sep.textContent = '·';
+        el.appendChild(sep);
+      }
+
+      const block = document.createElement('div');
+      let cls = 'word-block ' + COLORS[i % COLORS.length];
+      if (opts.swapL === i || opts.swapR === i) {
+        if (opts.phase === 'before') cls += ' swapping';
+      }
+      if (opts.done) cls += ' done-block';
+      block.className = cls;
+      block.innerHTML = `${escHtmlDisplay(w)}<span class="w-idx">${i}</span>`;
+      el.appendChild(block);
+    });
+  }
+
+  function escHtmlDisplay(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  // ===== Render step =====
+  function renderStep(idx) {
+    if (idx < 0 || idx >= steps.length) return;
+    const step = steps[idx];
+
+    // Code highlight
+    document.querySelectorAll('.code-line').forEach(el => el.classList.remove('active'));
+    const cl = document.querySelector(`.code-line[data-line="${step.codeLine}"]`);
+    if (cl) cl.classList.add('active');
+
+    // Flow highlight
+    document.querySelectorAll('.fl-node').forEach(el => el.classList.remove('active-fl'));
+    const fn = document.getElementById(step.flowId);
+    if (fn) fn.classList.add('active-fl');
+
+    // Info
+    document.getElementById('stepInfo').innerHTML =
+      `<strong>步骤 ${idx + 1}/${steps.length}：</strong>${step.info}`;
+
+    // Stage label
+    const label = document.getElementById('stageLabel');
+    const reverseArrow = document.getElementById('reverseArrow');
+    const joinResult = document.getElementById('joinResult');
+    const resultBanner = document.getElementById('resultBanner');
+
+    reverseArrow.classList.remove('show');
+    joinResult.style.display = 'none';
+    resultBanner.style.display = 'none';
+
+    switch (step.type) {
+      case 'original':
+        label.textContent = '📄 原始字符串';
+        label.style.borderColor = 'rgba(161,140,209,0.3)';
+        label.style.color = '#c9b8f0';
+        renderChars(step.chars, null, null);
+        renderWordBlocks(null);
+        break;
+
+      case 'trim':
+        label.textContent = '✂️ Step 1: trim() 去除首尾空格';
+        label.style.borderColor = 'rgba(246,211,101,0.4)';
+        label.style.color = '#f6d365';
+        renderChars(step.chars, step.trimStart, step.trimEnd);
+        renderWordBlocks(null);
+        break;
+
+      case 'split':
+        label.textContent = '🔪 Step 2: split() 分割成单词';
+        label.style.borderColor = 'rgba(161,140,209,0.4)';
+        label.style.color = '#c9b8f0';
+        renderChars(step.chars, step.trimStart, step.trimEnd);
+        renderWordBlocks(step.words);
+        break;
+
+      case 'show-words':
+        label.textContent = '📦 单词数组就绪';
+        label.style.borderColor = 'rgba(251,194,235,0.4)';
+        label.style.color = '#fbc2eb';
+        document.getElementById('charDisplay').innerHTML = '';
+        renderWordBlocks(step.words);
+        break;
+
+      case 'reverse-pair':
+        label.textContent = '🔄 Step 3: reverse() 反转中...';
+        label.style.borderColor = 'rgba(253,160,133,0.4)';
+        label.style.color = '#fda085';
+        reverseArrow.classList.add('show');
+        document.getElementById('charDisplay').innerHTML = '';
+        renderWordBlocks(step.words, { swapL: step.swapL, swapR: step.swapR, phase: step.phase });
+        break;
+
+      case 'reversed':
+        label.textContent = '✅ 反转完成';
+        label.style.borderColor = 'rgba(132,250,176,0.4)';
+        label.style.color = '#84fab0';
+        document.getElementById('charDisplay').innerHTML = '';
+        renderWordBlocks(step.words, { done: false });
+        break;
+
+      case 'join':
+        label.textContent = '🔗 Step 4: join() 拼接结果';
+        label.style.borderColor = 'rgba(132,250,176,0.4)';
+        label.style.color = '#84fab0';
+        document.getElementById('charDisplay').innerHTML = '';
+        renderWordBlocks(step.words, { done: true });
+        joinResult.style.display = 'block';
+        joinResult.textContent = `"${step.result}"`;
+        break;
+
+      case 'done':
+        label.textContent = '🎉 完成';
+        label.style.borderColor = 'rgba(132,250,176,0.5)';
+        label.style.color = '#84fab0';
+        document.getElementById('charDisplay').innerHTML = '';
+        renderWordBlocks(step.words, { done: true });
+        joinResult.style.display = 'block';
+        joinResult.textContent = `"${step.result}"`;
+        resultBanner.style.display = 'block';
+        document.getElementById('resultVal').textContent = `"${step.result}"`;
+        document.getElementById('resultDetail').textContent =
+          `原始："${step.original}" → 结果："${step.result}"`;
+        break;
+    }
+  }
+
+  // ===== Controls =====
+  function initViz() {
+    const s = document.getElementById('sInput').value || 'the sky is blue';
+    steps = genSteps(s);
+    curStep = -1;
+    renderChars(s, null, null);
+    document.getElementById('wordBlocks').innerHTML = '';
+    document.getElementById('reverseArrow').classList.remove('show');
+    document.getElementById('joinResult').style.display = 'none';
+    document.getElementById('resultBanner').style.display = 'none';
+
+    const label = document.getElementById('stageLabel');
+    label.textContent = '📄 原始字符串';
+    label.style.borderColor = 'rgba(161,140,209,0.3)';
+    label.style.color = '#c9b8f0';
+
+    document.getElementById('stepInfo').innerHTML =
+      `点击 <span class="hl-p">自动演示</span> 或 <span class="hl-y">单步</span> 开始。输入 = "<span class="hl-k">${escHtml(s)}</span>"`;
+
+    document.querySelectorAll('.code-line').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.fl-node').forEach(el => el.classList.remove('active-fl'));
+  }
+
+  function stepForward() {
+    if (curStep === -1 && steps.length === 0) initViz();
+    if (curStep < steps.length - 1) {
+      curStep++;
+      renderStep(curStep);
+    }
+  }
+
+  function getDelay() {
+    const v = document.getElementById('speedRange').value;
+    return 1900 - v * 160;
+  }
+
+  function runAuto() {
+    if (playing) {
+      clearTimeout(autoTimer);
+      playing = false;
+      document.querySelector('.btn-run').textContent = '▶ 自动演示';
+      return;
+    }
+    if (curStep === -1 || curStep >= steps.length - 1) initViz();
+    playing = true;
+    document.querySelector('.btn-run').textContent = '⏸ 暂停';
+
+    function tick() {
+      if (curStep < steps.length - 1) {
+        curStep++;
+        renderStep(curStep);
+        autoTimer = setTimeout(tick, getDelay());
+      } else {
+        playing = false;
+        document.querySelector('.btn-run').textContent = '▶ 自动演示';
+      }
+    }
+    tick();
+  }
+
+  function resetViz() {
+    clearTimeout(autoTimer);
+    playing = false;
+    document.querySelector('.btn-run').textContent = '▶ 自动演示';
+    initViz();
+  }
+
+  window.addEventListener('DOMContentLoaded', initViz);
+</script>
+</body>
+</html>

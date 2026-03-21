@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>压缩字符串 - 交互式图解</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;background:linear-gradient(135deg,#0a0e1a 0%,#111b2e 50%,#0b1320 100%);min-height:100vh;color:#e0e0e0;padding:28px 18px}
+.container{max-width:1160px;margin:0 auto}
+h1{text-align:center;font-size:2rem;margin-bottom:4px;background:linear-gradient(90deg,#ff6b6b,#ffd200,#84fab0,#00c9ff);background-size:300% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:hueShift 6s ease infinite}
+@keyframes hueShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.subtitle{text-align:center;color:#6d7f94;font-size:.9rem;margin-bottom:30px}
+
+.section{background:rgba(255,255,255,.028);border:1px solid rgba(255,255,255,.055);border-radius:16px;padding:24px 26px;margin-bottom:20px;backdrop-filter:blur(4px)}
+.section h2{font-size:1.1rem;margin-bottom:15px;display:flex;align-items:center;gap:8px}
+
+.problem{line-height:2;font-size:.92rem;color:#bcc6d2}
+.problem strong{color:#ffd200}
+.problem code{background:rgba(255,210,0,.08);padding:2px 7px;border-radius:5px;color:#ffd200;font-size:.83rem;font-family:'Fira Code',Consolas,monospace}
+.ex-box{background:rgba(255,255,255,.02);border-left:3px solid #00c9ff;border-radius:0 10px 10px 0;padding:13px 17px;margin-top:12px;margin-bottom:8px}
+.ex-box p{font-size:.84rem;line-height:1.9;color:#a0acb8;font-family:'Fira Code',Consolas,monospace}
+.ex-box .hl{color:#00c9ff;font-weight:600}
+.ex-box .hl-g{color:#84fab0;font-weight:600}
+.ex-box .hl-r{color:#ff6b6b;font-weight:600}
+.ex-box .hl-y{color:#ffd200;font-weight:600}
+
+.idea-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:13px}
+.idea-card{background:rgba(255,255,255,.018);border-radius:12px;padding:18px;border-left:3px solid;transition:transform .22s}
+.idea-card:hover{transform:translateY(-3px)}
+.idea-card:nth-child(1){border-color:#00c9ff}
+.idea-card:nth-child(2){border-color:#ffd200}
+.idea-card:nth-child(3){border-color:#ff6b6b}
+.idea-card:nth-child(4){border-color:#84fab0}
+.idea-card h3{font-size:.92rem;margin-bottom:8px}
+.idea-card p{font-size:.8rem;color:#96a3b1;line-height:1.75}
+.idea-card code{background:rgba(255,255,255,.06);padding:1px 5px;border-radius:3px;font-size:.76rem;font-family:'Fira Code',Consolas,monospace}
+
+.examples-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:13px}
+.ex-btn{padding:7px 15px;border:1.5px solid rgba(255,255,255,.08);border-radius:8px;background:rgba(255,255,255,.022);color:#90a0b2;font-size:.82rem;cursor:pointer;transition:all .2s;font-family:'Fira Code',Consolas,monospace}
+.ex-btn:hover{border-color:#00c9ff;color:#00c9ff;background:rgba(0,201,255,.06)}
+.ex-btn.active{border-color:#00c9ff;color:#00c9ff;background:rgba(0,201,255,.08)}
+.ctrl-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:center}
+.btn{padding:10px 22px;border:none;border-radius:10px;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .22s;white-space:nowrap}
+.btn:hover{transform:translateY(-2px)}
+.btn-run{background:linear-gradient(135deg,#00c9ff,#92fe9d);color:#0a1628}
+.btn-run:hover{box-shadow:0 6px 20px rgba(0,201,255,.35)}
+.btn-step{background:linear-gradient(135deg,#ffd200,#f7971e);color:#0a1628}
+.btn-step:hover{box-shadow:0 6px 20px rgba(255,210,0,.35)}
+.btn-reset{background:rgba(255,255,255,.06);color:#7a8d9f}
+.btn-reset:hover{background:rgba(255,255,255,.1);color:#bbb}
+.speed-ctrl{display:flex;align-items:center;gap:6px}
+.speed-ctrl label{font-size:.76rem;color:#7a8d9f}
+.speed-ctrl input[type=range]{width:86px;accent-color:#00c9ff}
+
+/* Code */
+.code-block{font-family:'Fira Code',Consolas,monospace;font-size:.8rem;line-height:1.85;overflow-x:auto}
+.code-line{padding:2px 12px;border-radius:4px;transition:background .35s,border-color .35s;white-space:pre;border-left:3px solid transparent}
+.code-line.active{background:rgba(0,201,255,.12);border-left-color:#00c9ff}
+.kw{color:#c678dd}.fn{color:#61afef}.cm{color:#5c6370;font-style:italic}.vr{color:#e5c07b}.op{color:#56b6c2}.st{color:#98c379}.nm{color:#d19a66}
+.complexity{margin-top:16px;padding:13px 16px;background:rgba(255,255,255,.02);border-radius:10px;display:flex;gap:36px;flex-wrap:wrap}
+.complexity span{font-size:.84rem;color:#96a3b1}
+.complexity strong{color:#00c9ff}
+
+/* Viz */
+.viz-stage-wrap{text-align:center;margin-bottom:14px}
+.viz-stage-label{text-align:center;font-size:.92rem;font-weight:700;margin-bottom:10px;padding:10px 20px;border-radius:10px;display:inline-block;transition:all .35s}
+
+.legend{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin:12px 0;padding:10px;background:rgba(255,255,255,.015);border-radius:10px}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:.74rem;color:#7a8d9f}
+.legend-dot{width:12px;height:12px;border-radius:3px}
+
+.arr-label{font-size:.75rem;font-weight:700;color:#5a6b80;margin-bottom:4px;letter-spacing:.5px;padding-left:4px}
+.arr-row{display:flex;justify-content:center;gap:4px;flex-wrap:wrap;margin:6px 0;min-height:56px;align-items:flex-end}
+.cell{display:flex;flex-direction:column;align-items:center;gap:2px;transition:all .4s}
+.cell .c-idx{font-size:.56rem;color:#3a4a5a;font-family:'Fira Code',Consolas,monospace}
+.cell .c-box{min-width:42px;height:42px;display:flex;align-items:center;justify-content:center;border:1.5px solid rgba(255,255,255,.08);border-radius:7px;font-size:1rem;font-family:'Fira Code',Consolas,monospace;font-weight:700;padding:0 6px;transition:all .4s;background:rgba(255,255,255,.015)}
+.cell .c-tag{font-size:.52rem;font-weight:700;padding:1px 5px;border-radius:4px;min-height:14px;transition:all .3s;white-space:nowrap}
+
+/* Cell states */
+.cell.hl-read .c-box{border-color:rgba(255,210,0,.6);background:rgba(255,210,0,.1);color:#ffd200;box-shadow:0 0 10px rgba(255,210,0,.2)}
+.cell.hl-write .c-box{border-color:rgba(0,201,255,.6);background:rgba(0,201,255,.1);color:#00c9ff;box-shadow:0 0 10px rgba(0,201,255,.2)}
+.cell.hl-count .c-box{border-color:rgba(255,107,107,.6);background:rgba(255,107,107,.1);color:#ff6b6b}
+.cell.hl-written .c-box{border-color:rgba(132,250,176,.5);background:rgba(132,250,176,.08);color:#84fab0}
+.cell.hl-group .c-box{border-color:rgba(146,126,255,.5);background:rgba(146,126,255,.08);color:#927eff}
+.cell.hl-dim .c-box{border-color:rgba(255,255,255,.03);color:#2a3a4a}
+.cell.hl-done .c-box{border-color:rgba(132,250,176,.4);background:rgba(132,250,176,.06);color:#84fab0}
+.cell.hl-rw .c-box{border-color:rgba(255,165,0,.7);background:rgba(255,165,0,.12);color:#ffa500;box-shadow:0 0 12px rgba(255,165,0,.25)}
+
+@keyframes popIn{0%{transform:scale(.7);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+@keyframes writePulse{0%{box-shadow:0 0 0 rgba(132,250,176,0)}50%{box-shadow:0 0 18px rgba(132,250,176,.4)}100%{box-shadow:0 0 0 rgba(132,250,176,0)}}
+
+.pointer-row{display:flex;justify-content:center;gap:4px;min-height:22px;align-items:center;margin:2px 0}
+.ptr{font-size:.64rem;font-weight:800;padding:1px 6px;border-radius:4px;transition:all .4s;opacity:0;font-family:'Fira Code',Consolas,monospace;min-width:42px;text-align:center}
+.ptr.show{opacity:1}
+
+.var-panel{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:14px 0}
+.var-box{padding:12px 16px;border-radius:12px;background:rgba(255,255,255,.02);border:1.5px solid rgba(255,255,255,.05);transition:all .4s}
+.var-box.active{border-color:rgba(255,210,0,.4);box-shadow:0 0 14px rgba(255,210,0,.1)}
+.var-box .v-label{font-size:.68rem;color:#5a6b80;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px}
+.var-box .v-val{font-size:1.25rem;font-weight:800;font-family:'Fira Code',Consolas,monospace;transition:all .3s}
+.v-blue{color:#00c9ff}.v-red{color:#ff6b6b}.v-green{color:#84fab0}.v-yellow{color:#ffd200}.v-gray{color:#3a4a5a}.v-purple{color:#927eff}.v-orange{color:#ffa500}
+
+.formula-panel{padding:14px 20px;background:rgba(255,255,255,.025);border-radius:12px;margin:14px 0;text-align:center;font-family:'Fira Code',Consolas,monospace;font-size:.88rem;min-height:50px;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;line-height:1.8;transition:all .3s}
+.f-label{font-size:.7rem;font-weight:700;color:#5a6b80;padding:2px 8px;border-radius:6px;background:rgba(255,255,255,.03)}
+
+/* Output preview */
+.output-section{margin:16px 0}
+.output-row{display:flex;justify-content:center;gap:4px;flex-wrap:wrap;min-height:48px;align-items:center;padding:12px;background:rgba(255,255,255,.015);border-radius:10px;border:1px dashed rgba(132,250,176,.15)}
+.out-cell{min-width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:6px;font-family:'Fira Code',Consolas,monospace;font-weight:700;font-size:.95rem;transition:all .4s}
+.out-cell.filled{background:rgba(132,250,176,.1);border:1.5px solid rgba(132,250,176,.35);color:#84fab0}
+.out-cell.empty{background:rgba(255,255,255,.015);border:1.5px dashed rgba(255,255,255,.06);color:#2a3a4a}
+.out-cell.latest{animation:popIn .35s ease-out}
+
+.step-info{padding:14px 20px;background:rgba(255,255,255,.028);border-radius:10px;font-size:.88rem;color:#bcc6d0;line-height:1.85;min-height:50px;margin-top:14px}
+.hl-o{color:#f7971e;font-weight:600}.hl-b{color:#00c9ff;font-weight:600}.hl-r{color:#ff6b6b;font-weight:600}.hl-g{color:#84fab0;font-weight:600}.hl-w{color:#fff;font-weight:700}.hl-y{color:#ffd200;font-weight:600}.hl-p{color:#927eff;font-weight:600}
+
+.result-banner{margin-top:16px;padding:20px 24px;border-radius:14px;text-align:center;display:none;background:rgba(132,250,176,.07);border:2px solid rgba(132,250,176,.25)}
+.result-banner .r-title{font-size:1rem;font-weight:800;color:#84fab0;margin-bottom:8px}
+.result-banner .r-row{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin:10px 0}
+.result-banner .r-cell{min-width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:6px;background:rgba(132,250,176,.1);border:1.5px solid rgba(132,250,176,.3);color:#84fab0;font-family:'Fira Code',Consolas,monospace;font-weight:700;font-size:.9rem}
+.result-banner .r-detail{font-size:.84rem;color:#7a8d9f;margin-top:6px}
+
+/* Flowchart */
+.flowchart{display:flex;flex-direction:column;align-items:center;gap:0}
+.fl-node{padding:11px 22px;border-radius:12px;font-size:.82rem;font-weight:600;text-align:center;max-width:520px;transition:all .35s;width:fit-content}
+.fl-node.start{background:linear-gradient(135deg,#667eea,#764ba2);border-radius:28px}
+.fl-node.process{background:rgba(0,201,255,.06);border:2px solid rgba(0,201,255,.18)}
+.fl-node.decision{background:rgba(255,210,0,.04);border:2px solid rgba(255,210,0,.18);border-radius:4px}
+.fl-node.action{background:rgba(255,107,107,.05);border:2px solid rgba(255,107,107,.18)}
+.fl-node.action2{background:rgba(132,250,176,.05);border:2px solid rgba(132,250,176,.18)}
+.fl-node.end{background:linear-gradient(135deg,#11998e,#38ef7d);border-radius:28px;color:#000}
+.fl-node.active-fl{box-shadow:0 0 22px rgba(255,210,0,.4);border-color:#ffd200 !important}
+.fl-arrow{width:2px;height:14px;background:rgba(255,255,255,.08);position:relative}
+.fl-arrow::after{content:'▼';position:absolute;bottom:-9px;left:50%;transform:translateX(-50%);font-size:.5rem;color:rgba(255,255,255,.15)}
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>🗜️ 压缩字符串</h1>
+<p class="subtitle">LeetCode 443 · String Compression · 双指针原地压缩</p>
+
+<!-- Problem -->
+<div class="section">
+  <h2 style="color:#ffd200">📋 题目描述</h2>
+  <div class="problem">
+    给你一个字符数组 <code>chars</code>，请使用下述算法 <strong>原地</strong> 压缩：<br><br>
+    从一个空字符串 <code>s</code> 开始。对于 <code>chars</code> 中的每组 <strong>连续重复字符</strong>：<br>
+    • 如果这一组的长度为 <strong>1</strong>，则将字符追加到 <code>s</code> 中。<br>
+    • 否则，需要向 <code>s</code> 中追加字符，后跟这一组的 <strong>长度</strong>（数字的每一位作为单独字符）。<br><br>
+    压缩后的字符串 <code>s</code> 不应该直接返回，而是存储在输入的字符数组 <code>chars</code> 中。<br>
+    注意 <code>chars</code> 的长度被更新为压缩后的新长度。请返回该数组的 <strong>新长度</strong>。<br><br>
+    <strong>⚠️ 必须原地修改，只允许 O(1) 额外空间。</strong>
+    <div class="ex-box">
+      <p><span class="hl">示例 1：</span>chars = [<span class="hl-y">"a"</span>,<span class="hl-y">"a"</span>,<span class="hl-y">"b"</span>,<span class="hl-y">"b"</span>,<span class="hl-y">"c"</span>,<span class="hl-y">"c"</span>,<span class="hl-y">"c"</span>]</p>
+      <p>→ 返回 <span class="hl-g">6</span>，chars 前6位 = [<span class="hl-g">"a","2","b","2","c","3"</span>]</p>
+    </div>
+    <div class="ex-box">
+      <p><span class="hl">示例 2：</span>chars = [<span class="hl-y">"a"</span>]</p>
+      <p>→ 返回 <span class="hl-g">1</span>，chars = [<span class="hl-g">"a"</span>]（单个字符不写数字）</p>
+    </div>
+    <div class="ex-box">
+      <p><span class="hl">示例 3：</span>chars = [<span class="hl-y">"a"</span>,<span class="hl-y">"b"</span>,<span class="hl-y">"b"</span>,<span class="hl-y">"b"</span>,<span class="hl-y">"b"</span>,<span class="hl-y">"b"</span>,<span class="hl-y">"b"</span>,<span class="hl-y">"b"</span>,<span class="hl-y">"b"</span>,<span class="hl-y">"b"</span>,<span class="hl-y">"b"</span>,<span class="hl-y">"b"</span>,<span class="hl-y">"b"</span>]</p>
+      <p>→ 返回 <span class="hl-g">4</span>，chars 前4位 = [<span class="hl-g">"a","b","1","2"</span>]（12 拆成 "1" 和 "2"）</p>
+    </div>
+  </div>
+</div>
+
+<!-- Ideas -->
+<div class="section">
+  <h2 style="color:#00c9ff">💡 核心思路 — 读写双指针 + 原地压缩</h2>
+  <div class="idea-grid">
+    <div class="idea-card">
+      <h3 style="color:#00c9ff">① read 读指针</h3>
+      <p><code>read</code> 指针负责 <strong>向前扫描</strong>，统计当前字符连续出现的次数，直到遇到不同字符或数组末尾。</p>
+    </div>
+    <div class="idea-card">
+      <h3 style="color:#ffd200">② write 写指针</h3>
+      <p><code>write</code> 指针负责 <strong>原地写入</strong> 压缩结果。先写字符本身，若 count > 1 再写入计数数字的每一位。</p>
+    </div>
+    <div class="idea-card">
+      <h3 style="color:#ff6b6b">③ 统计连续计数</h3>
+      <p>内层循环从当前 <code>read</code> 开始，不断前进直到 <code>chars[read] ≠ 当前字符</code>，差值即为 <strong>count</strong>。</p>
+    </div>
+    <div class="idea-card">
+      <h3 style="color:#84fab0">④ 写入规则</h3>
+      <p>写入字符 → 若 count > 1，将数字转为字符串，<strong>逐位写入</strong>（处理 ≥ 10 的情况如 "12" → '1','2'）。</p>
+    </div>
+  </div>
+</div>
+
+<!-- Controls -->
+<div class="section">
+  <h2 style="color:#f7971e">🎮 交互控制</h2>
+  <div class="examples-row" id="exBtns">
+    <button class="ex-btn" onclick="loadEx(['a','a','b','b','c','c','c'])">aabbccc</button>
+    <button class="ex-btn" onclick="loadEx(['a'])">a</button>
+    <button class="ex-btn" onclick="loadEx(['a','b','b','b','b','b','b','b','b','b','b','b','b'])">a+b×12</button>
+    <button class="ex-btn" onclick="loadEx(['a','a','a','a','b','b','c'])">aaaabbc</button>
+    <button class="ex-btn" onclick="loadEx(['a','b','c'])">abc</button>
+    <button class="ex-btn" onclick="loadEx(['a','a','a','a','a','a','a','a','a','a'])">a×10</button>
+  </div>
+  <div class="ctrl-row">
+    <button class="btn btn-run" id="btnRun" onclick="runAuto()">▶ 自动演示</button>
+    <button class="btn btn-step" onclick="stepForward()">⏭ 单步</button>
+    <button class="btn btn-reset" onclick="resetViz()">↺ 重置</button>
+    <div class="speed-ctrl">
+      <label>速度</label>
+      <input type="range" id="speedRange" min="1" max="10" value="5">
+    </div>
+  </div>
+</div>
+
+<!-- Code -->
+<div class="section">
+  <h2 style="color:#84fab0">💻 JavaScript 代码</h2>
+  <div class="code-block">
+    <div class="code-line" data-line="0"><span class="kw">var</span> <span class="fn">compress</span> = <span class="kw">function</span>(<span class="vr">chars</span>) {</div>
+    <div class="code-line" data-line="1">  <span class="kw">let</span> <span class="vr">write</span> = <span class="nm">0</span>;                     <span class="cm">// write pointer</span></div>
+    <div class="code-line" data-line="2">  <span class="kw">let</span> <span class="vr">read</span>  = <span class="nm">0</span>;                     <span class="cm">// read pointer</span></div>
+    <div class="code-line" data-line="3"></div>
+    <div class="code-line" data-line="4">  <span class="kw">while</span> (<span class="vr">read</span> <span class="op">&lt;</span> <span class="vr">chars</span>.<span class="fn">length</span>) {</div>
+    <div class="code-line" data-line="5">    <span class="kw">const</span> <span class="vr">ch</span> = <span class="vr">chars</span>[<span class="vr">read</span>];            <span class="cm">// current char</span></div>
+    <div class="code-line" data-line="6">    <span class="kw">let</span> <span class="vr">count</span> = <span class="nm">0</span>;                    <span class="cm">// repetition count</span></div>
+    <div class="code-line" data-line="7"></div>
+    <div class="code-line" data-line="8">    <span class="kw">while</span> (<span class="vr">read</span> <span class="op">&lt;</span> <span class="vr">chars</span>.<span class="fn">length</span> <span class="op">&&</span> <span class="vr">chars</span>[<span class="vr">read</span>] <span class="op">===</span> <span class="vr">ch</span>) {</div>
+    <div class="code-line" data-line="9">      <span class="vr">read</span>++;                        <span class="cm">// advance read</span></div>
+    <div class="code-line" data-line="10">      <span class="vr">count</span>++;                       <span class="cm">// increment count</span></div>
+    <div class="code-line" data-line="11">    }</div>
+    <div class="code-line" data-line="12"></div>
+    <div class="code-line" data-line="13">    <span class="vr">chars</span>[<span class="vr">write</span>++] = <span class="vr">ch</span>;              <span class="cm">// write the char</span></div>
+    <div class="code-line" data-line="14"></div>
+    <div class="code-line" data-line="15">    <span class="kw">if</span> (<span class="vr">count</span> <span class="op">&gt;</span> <span class="nm">1</span>) {                   <span class="cm">// write digits if > 1</span></div>
+    <div class="code-line" data-line="16">      <span class="kw">for</span> (<span class="kw">const</span> <span class="vr">d</span> <span class="kw">of</span> <span class="st">String</span>(<span class="vr">count</span>)) {</div>
+    <div class="code-line" data-line="17">        <span class="vr">chars</span>[<span class="vr">write</span>++] = <span class="vr">d</span>;            <span class="cm">// write each digit</span></div>
+    <div class="code-line" data-line="18">      }</div>
+    <div class="code-line" data-line="19">    }</div>
+    <div class="code-line" data-line="20">  }</div>
+    <div class="code-line" data-line="21"></div>
+    <div class="code-line" data-line="22">  <span class="kw">return</span> <span class="vr">write</span>;                      <span class="cm">// new length</span></div>
+    <div class="code-line" data-line="23">};</div>
+  </div>
+  <div class="complexity">
+    <span>时间复杂度：<strong>O(n)</strong> — 每个元素被读一次</span>
+    <span>空间复杂度：<strong>O(1)</strong> — 原地修改</span>
+  </div>
+</div>
+
+<!-- Visualization -->
+<div class="section">
+  <h2 style="color:#ff6b6b">🎨 动画图解</h2>
+
+  <div class="viz-stage-wrap">
+    <div class="viz-stage-label" id="stageLabel" style="background:rgba(0,201,255,.08);border:1.5px solid rgba(0,201,255,.3);color:#00c9ff;">等待开始</div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:rgba(255,210,0,.6)"></div>read 读指针</div>
+    <div class="legend-item"><div class="legend-dot" style="background:rgba(0,201,255,.6)"></div>write 写指针</div>
+    <div class="legend-item"><div class="legend-dot" style="background:rgba(255,165,0,.6)"></div>read & write 重合</div>
+    <div class="legend-item"><div class="legend-dot" style="background:rgba(146,126,255,.5)"></div>当前连续分组</div>
+    <div class="legend-item"><div class="legend-dot" style="background:rgba(132,250,176,.5)"></div>已写入结果</div>
+    <div class="legend-item"><div class="legend-dot" style="background:rgba(255,255,255,.04)"></div>已扫描</div>
+  </div>
+
+  <!-- Original array -->
+  <div>
+    <div class="arr-label">chars[]（原地操作）</div>
+    <div class="arr-row" id="charsRow"></div>
+  </div>
+  <div class="pointer-row" id="ptrRow"></div>
+
+  <!-- Variable panel -->
+  <div class="var-panel">
+    <div class="var-box" id="varRead"><div class="v-label">read 读指针</div><div class="v-val v-yellow" id="valRead">0</div></div>
+    <div class="var-box" id="varWrite"><div class="v-label">write 写指针</div><div class="v-val v-blue" id="valWrite">0</div></div>
+    <div class="var-box" id="varCh"><div class="v-label">当前字符 ch</div><div class="v-val v-purple" id="valCh">—</div></div>
+    <div class="var-box" id="varCount"><div class="v-label">连续计数 count</div><div class="v-val v-red" id="valCount">0</div></div>
+    <div class="var-box" id="varAction"><div class="v-label">当前操作</div><div class="v-val v-green" id="valAction" style="font-size:.82rem">—</div></div>
+  </div>
+
+  <!-- Formula -->
+  <div class="formula-panel" id="formulaPanel">
+    <span style="color:#5a6b80">压缩过程将在这里显示</span>
+  </div>
+
+  <!-- Output preview -->
+  <div class="output-section">
+    <div class="arr-label">📦 压缩结果预览（write 指针已写入的内容）</div>
+    <div class="output-row" id="outputRow">
+      <span style="color:#3a4a5a;font-size:.82rem">等待开始...</span>
+    </div>
+  </div>
+
+  <!-- Step info -->
+  <div class="step-info" id="stepInfo">点击 <span class="hl-b">自动演示</span> 或 <span class="hl-y">单步</span> 开始可视化。</div>
+
+  <!-- Result banner -->
+  <div class="result-banner" id="resultBanner">
+    <div class="r-title" id="rTitle"></div>
+    <div class="r-row" id="rRow"></div>
+    <div class="r-detail" id="rDetail"></div>
+  </div>
+</div>
+
+<!-- Flowchart -->
+<div class="section">
+  <h2 style="color:#ffd200">📊 算法流程图</h2>
+  <div class="flowchart">
+    <div class="fl-node start" id="fl-start">开始：输入 chars[]</div>
+    <div class="fl-arrow"></div>
+    <div class="fl-node process" id="fl-init">初始化 write = 0，read = 0</div>
+    <div class="fl-arrow"></div>
+    <div class="fl-node decision" id="fl-outer">read &lt; chars.length？</div>
+    <div class="fl-arrow"></div>
+    <div class="fl-node process" id="fl-ch">记录 ch = chars[read]，count = 0</div>
+    <div class="fl-arrow"></div>
+    <div class="fl-node action" id="fl-count">内层循环：统计 ch 连续出现次数（read++，count++）</div>
+    <div class="fl-arrow"></div>
+    <div class="fl-node action2" id="fl-writechar">写入字符：chars[write++] = ch</div>
+    <div class="fl-arrow"></div>
+    <div class="fl-node decision" id="fl-check">count > 1？</div>
+    <div class="fl-arrow"></div>
+    <div class="fl-node action2" id="fl-writedigit">写入计数数字：逐位写入 chars[write++] = digit</div>
+    <div class="fl-arrow"></div>
+    <div class="fl-node process" id="fl-loop">↩ 回到外层循环继续</div>
+    <div class="fl-arrow"></div>
+    <div class="fl-node end" id="fl-end">返回 write（压缩后新长度）✅</div>
+  </div>
+</div>
+
+</div>
+
+<script>
+let steps = [];
+let curStep = -1;
+let autoTimer = null;
+let playing = false;
+let currentChars = ['a','a','b','b','c','c','c'];
+
+function loadEx(arr) {
+  currentChars = [...arr];
+  resetViz();
+}
+
+// ===== Generate Steps =====
+function genSteps(inputChars) {
+  const chars = [...inputChars];
+  const n = chars.length;
+  const st = [];
+  let write = 0, read = 0;
+
+  // Step: init
+  st.push({
+    type: 'init', codeLine: 1, flowId: 'fl-init',
+    chars: [...chars], read: 0, write: 0, ch: null, count: 0,
+    action: '初始化',
+    formula: '<span class="f-label">初始化</span> write = 0，read = 0',
+    info: '初始化双指针：<span class="hl-b">write = 0</span>（写入位置），<span class="hl-y">read = 0</span>（读取位置）。',
+    cellStates: new Array(n).fill('none'),
+    output: []
+  });
+
+  let output = [];
+
+  while (read < n) {
+    const ch = chars[read];
+    let count = 0;
+    const groupStart = read;
+
+    // Step: record ch
+    let cs1 = new Array(n).fill('dim');
+    for (let k = 0; k < write; k++) cs1[k] = 'written';
+    cs1[read] = read === write ? 'rw' : 'read';
+    st.push({
+      type: 'record-ch', codeLine: 5, flowId: 'fl-ch',
+      chars: [...chars], read, write, ch, count: 0,
+      action: `ch = "${ch}"`,
+      formula: `<span class="f-label">外层</span> ch = chars[<span style="color:#ffd200">${read}</span>] = "<span style="color:#927eff;font-weight:700">${ch}</span>"，开始统计连续出现次数`,
+      info: `记录当前字符 <span class="hl-p">ch = "${ch}"</span>，从位置 <span class="hl-y">read = ${read}</span> 开始统计连续个数。`,
+      cellStates: [...cs1],
+      output: [...output]
+    });
+
+    // Count loop
+    while (read < n && chars[read] === ch) {
+      read++;
+      count++;
+
+      let cs2 = new Array(n).fill('dim');
+      for (let k = 0; k < write; k++) cs2[k] = 'written';
+      for (let k = groupStart; k < read; k++) cs2[k] = 'group';
+      if (read < n) cs2[read] = 'read'; // next read position
+
+      st.push({
+        type: 'counting', codeLine: 9, flowId: 'fl-count',
+        chars: [...chars], read, write, ch, count,
+        action: `count = ${count}`,
+        formula: `<span class="f-label">内层</span> chars[${read - 1}] = "${ch}" === ch → read = ${read}，count = <span style="color:#ff6b6b;font-weight:700">${count}</span>`,
+        info: `扫描到 <span class="hl-p">chars[${read - 1}] = "${ch}"</span>，匹配！<span class="hl-y">read++</span> → ${read}，<span class="hl-r">count++</span> → ${count}。`,
+        cellStates: [...cs2],
+        output: [...output]
+      });
+    }
+
+    // Write the character
+    chars[write] = ch;
+    const writeCharPos = write;
+    write++;
+    output.push(ch);
+
+    let cs3 = new Array(n).fill('dim');
+    for (let k = 0; k < write; k++) cs3[k] = 'written';
+    cs3[writeCharPos] = 'done'; // just written
+
+    st.push({
+      type: 'write-char', codeLine: 13, flowId: 'fl-writechar',
+      chars: [...chars], read, write, ch, count,
+      action: `写入 "${ch}"`,
+      formula: `<span class="f-label">写字符</span> chars[<span style="color:#00c9ff">${writeCharPos}</span>] = "<span style="color:#84fab0;font-weight:700">${ch}</span>"，write → ${write}`,
+      info: `将字符 <span class="hl-g">"${ch}"</span> 写入 <span class="hl-b">chars[${writeCharPos}]</span>，write 前进到 <span class="hl-b">${write}</span>。`,
+      cellStates: [...cs3],
+      output: [...output],
+      justWrote: ch
+    });
+
+    // Write count digits if > 1
+    if (count > 1) {
+      const digits = String(count);
+      for (let d = 0; d < digits.length; d++) {
+        chars[write] = digits[d];
+        const wdPos = write;
+        write++;
+        output.push(digits[d]);
+
+        let cs4 = new Array(n).fill('dim');
+        for (let k = 0; k < write; k++) cs4[k] = 'written';
+        cs4[wdPos] = 'done';
+
+        st.push({
+          type: 'write-digit', codeLine: 17, flowId: 'fl-writedigit',
+          chars: [...chars], read, write, ch, count,
+          action: `写入 "${digits[d]}"`,
+          formula: `<span class="f-label">写计数</span> count=${count}${digits.length > 1 ? ' → "' + digits + '"' : ''}，chars[<span style="color:#00c9ff">${wdPos}</span>] = "<span style="color:#84fab0;font-weight:700">${digits[d]}</span>"，write → ${write}`,
+          info: `计数 <span class="hl-r">${count}</span>${digits.length > 1 ? '（拆为 ' + digits.split('').map(x => '"' + x + '"').join(', ') + '）' : ''}，写入数字 <span class="hl-g">"${digits[d]}"</span> 到 <span class="hl-b">chars[${wdPos}]</span>，write → <span class="hl-b">${write}</span>。`,
+          cellStates: [...cs4],
+          output: [...output],
+          justWrote: digits[d]
+        });
+      }
+    } else {
+      // count == 1, no digit to write
+      let cs5 = new Array(n).fill('dim');
+      for (let k = 0; k < write; k++) cs5[k] = 'written';
+
+      st.push({
+        type: 'skip-digit', codeLine: 15, flowId: 'fl-check',
+        chars: [...chars], read, write, ch, count,
+        action: 'count=1 跳过',
+        formula: `<span class="f-label">判断</span> count = 1，不需要写入计数数字，跳过`,
+        info: `<span class="hl-r">count = 1</span>，单个字符不写计数，直接进入下一轮。`,
+        cellStates: [...cs5],
+        output: [...output]
+      });
+    }
+  }
+
+  // Final step
+  let csFinal = new Array(n).fill('dim');
+  for (let k = 0; k < write; k++) csFinal[k] = 'done';
+
+  st.push({
+    type: 'done', codeLine: 22, flowId: 'fl-end',
+    chars: [...chars], read, write, ch: null, count: 0,
+    action: `返回 ${write}`,
+    formula: `<span class="f-label">完成</span> 返回 write = <span style="color:#84fab0;font-weight:700;font-size:1.1rem">${write}</span>`,
+    info: `✅ 压缩完成！返回新长度 <span class="hl-g">${write}</span>。压缩结果：[${output.map(x => '"' + x + '"').join(', ')}]`,
+    cellStates: [...csFinal],
+    output: [...output],
+    finalLength: write
+  });
+
+  return st;
+}
+
+// ===== Render =====
+function renderCharsRow(step) {
+  const el = document.getElementById('charsRow');
+  el.innerHTML = '';
+  if (!step) {
+    currentChars.forEach((v, i) => {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.innerHTML = `<div class="c-idx">${i}</div><div class="c-box">${v}</div><div class="c-tag">&nbsp;</div>`;
+      el.appendChild(cell);
+    });
+    return;
+  }
+  const chars = step.chars;
+  const n = chars.length;
+  for (let i = 0; i < n; i++) {
+    const cell = document.createElement('div');
+    let cls = 'cell';
+    const state = step.cellStates[i];
+    if (state === 'read') cls += ' hl-read';
+    else if (state === 'write') cls += ' hl-write';
+    else if (state === 'rw') cls += ' hl-rw';
+    else if (state === 'group') cls += ' hl-group';
+    else if (state === 'written') cls += ' hl-written';
+    else if (state === 'done') cls += ' hl-done';
+    else if (state === 'dim') cls += ' hl-dim';
+    cell.className = cls;
+
+    let tag = '&nbsp;';
+    if (state === 'read') tag = '<div class="c-tag" style="background:rgba(255,210,0,.15);color:#ffd200">read</div>';
+    else if (state === 'write') tag = '<div class="c-tag" style="background:rgba(0,201,255,.15);color:#00c9ff">write</div>';
+    else if (state === 'rw') tag = '<div class="c-tag" style="background:rgba(255,165,0,.15);color:#ffa500">r&w</div>';
+    else if (state === 'group') tag = '<div class="c-tag" style="background:rgba(146,126,255,.12);color:#927eff">分组</div>';
+    else if (state === 'done') tag = '<div class="c-tag" style="background:rgba(132,250,176,.15);color:#84fab0">✓写入</div>';
+    else if (state === 'written') tag = '<div class="c-tag" style="background:rgba(132,250,176,.1);color:#5a8a6a">已写</div>';
+    else tag = '<div class="c-tag">&nbsp;</div>';
+
+    cell.innerHTML = `<div class="c-idx">${i}</div><div class="c-box">${chars[i]}</div>${tag}`;
+    if (state === 'done' && step.justWrote) {
+      cell.querySelector('.c-box').style.animation = 'writePulse .5s ease';
+    }
+    el.appendChild(cell);
+  }
+}
+
+function renderPointers(step) {
+  const el = document.getElementById('ptrRow');
+  el.innerHTML = '';
+  const n = currentChars.length;
+  if (!step) return;
+  for (let i = 0; i < n; i++) {
+    const ptr = document.createElement('span');
+    ptr.style.minWidth = '42px';
+    ptr.style.textAlign = 'center';
+    ptr.style.display = 'inline-block';
+    ptr.style.fontSize = '.6rem';
+
+    const isRead = i === step.read && step.read < n;
+    const isWrite = i === step.write && step.write < n;
+    if (isRead && isWrite) {
+      ptr.className = 'ptr show';
+      ptr.style.background = 'rgba(255,165,0,.12)'; ptr.style.color = '#ffa500'; ptr.style.border = '1px solid rgba(255,165,0,.3)';
+      ptr.textContent = '▲r&w';
+    } else if (isRead) {
+      ptr.className = 'ptr show';
+      ptr.style.background = 'rgba(255,210,0,.1)'; ptr.style.color = '#ffd200'; ptr.style.border = '1px solid rgba(255,210,0,.3)';
+      ptr.textContent = '▲read';
+    } else if (isWrite) {
+      ptr.className = 'ptr show';
+      ptr.style.background = 'rgba(0,201,255,.1)'; ptr.style.color = '#00c9ff'; ptr.style.border = '1px solid rgba(0,201,255,.3)';
+      ptr.textContent = '▲write';
+    } else {
+      ptr.className = 'ptr';
+      ptr.innerHTML = '&nbsp;';
+    }
+    el.appendChild(ptr);
+  }
+}
+
+function renderOutput(output, justWrote) {
+  const el = document.getElementById('outputRow');
+  el.innerHTML = '';
+  if (!output || output.length === 0) {
+    el.innerHTML = '<span style="color:#3a4a5a;font-size:.82rem">暂无输出...</span>';
+    return;
+  }
+  output.forEach((ch, i) => {
+    const c = document.createElement('div');
+    c.className = 'out-cell filled';
+    if (i === output.length - 1 && justWrote) c.classList.add('latest');
+    c.textContent = ch;
+    el.appendChild(c);
+  });
+}
+
+function renderStep(idx) {
+  if (idx < 0 || idx >= steps.length) return;
+  const s = steps[idx];
+
+  // Code highlight
+  document.querySelectorAll('.code-line').forEach(el => el.classList.remove('active'));
+  const cl = document.querySelector(`.code-line[data-line="${s.codeLine}"]`);
+  if (cl) cl.classList.add('active');
+
+  // Flow highlight
+  document.querySelectorAll('.fl-node').forEach(el => el.classList.remove('active-fl'));
+  const fn = document.getElementById(s.flowId);
+  if (fn) fn.classList.add('active-fl');
+
+  // Stage label
+  const label = document.getElementById('stageLabel');
+  const banner = document.getElementById('resultBanner');
+  banner.style.display = 'none';
+
+  const typeStyles = {
+    'init': { text: '📦 初始化', borderColor: 'rgba(0,201,255,.4)', color: '#00c9ff' },
+    'record-ch': { text: `📖 记录字符 "${s.ch}"`, borderColor: 'rgba(146,126,255,.4)', color: '#927eff' },
+    'counting': { text: `🔍 统计 "${s.ch}" 连续次数 → ${s.count}`, borderColor: 'rgba(255,210,0,.4)', color: '#ffd200' },
+    'write-char': { text: `✏️ 写入字符 "${s.ch}"`, borderColor: 'rgba(132,250,176,.4)', color: '#84fab0' },
+    'write-digit': { text: `✏️ 写入计数数字`, borderColor: 'rgba(132,250,176,.4)', color: '#84fab0' },
+    'skip-digit': { text: `⏩ count=1 跳过计数`, borderColor: 'rgba(255,107,107,.3)', color: '#ff6b6b' },
+    'done': { text: `✅ 完成！新长度 = ${s.write}`, borderColor: 'rgba(132,250,176,.5)', color: '#84fab0' }
+  };
+  const ts = typeStyles[s.type] || typeStyles['init'];
+  label.textContent = ts.text;
+  label.style.borderColor = ts.borderColor;
+  label.style.color = ts.color;
+
+  // Array
+  renderCharsRow(s);
+  renderPointers(s);
+
+  // Variables
+  document.getElementById('valRead').textContent = s.read;
+  document.getElementById('valWrite').textContent = s.write;
+  document.getElementById('valCh').textContent = s.ch !== null ? `"${s.ch}"` : '—';
+  document.getElementById('valCount').textContent = s.count;
+  document.getElementById('valAction').textContent = s.action;
+
+  document.querySelectorAll('.var-box').forEach(el => el.classList.remove('active'));
+  if (s.type === 'counting') document.getElementById('varCount').classList.add('active');
+  else if (s.type === 'write-char' || s.type === 'write-digit') document.getElementById('varWrite').classList.add('active');
+  else if (s.type === 'record-ch') document.getElementById('varCh').classList.add('active');
+
+  // Formula
+  document.getElementById('formulaPanel').innerHTML = s.formula || '';
+
+  // Output
+  renderOutput(s.output, s.justWrote);
+
+  // Step info
+  document.getElementById('stepInfo').innerHTML = `<strong>步骤 ${idx + 1}/${steps.length}：</strong>${s.info}`;
+
+  // Result
+  if (s.type === 'done') {
+    banner.style.display = 'block';
+    document.getElementById('rTitle').textContent = `✅ 压缩完成！新长度 = ${s.finalLength}`;
+    const rRow = document.getElementById('rRow');
+    rRow.innerHTML = '';
+    s.output.forEach(ch => {
+      const c = document.createElement('div');
+      c.className = 'r-cell';
+      c.textContent = ch;
+      rRow.appendChild(c);
+    });
+    document.getElementById('rDetail').textContent = `原数组长度 ${currentChars.length} → 压缩后 ${s.finalLength}，压缩率 ${Math.round((1 - s.finalLength / currentChars.length) * 100)}%`;
+  }
+}
+
+// ===== Controls =====
+function initViz() {
+  steps = genSteps(currentChars);
+  curStep = -1;
+
+  renderCharsRow(null);
+  document.getElementById('ptrRow').innerHTML = '';
+  document.getElementById('outputRow').innerHTML = '<span style="color:#3a4a5a;font-size:.82rem">等待开始...</span>';
+  document.getElementById('formulaPanel').innerHTML = '<span style="color:#5a6b80">压缩过程将在这里显示</span>';
+  document.getElementById('resultBanner').style.display = 'none';
+
+  document.getElementById('valRead').textContent = '0';
+  document.getElementById('valWrite').textContent = '0';
+  document.getElementById('valCh').textContent = '—';
+  document.getElementById('valCount').textContent = '0';
+  document.getElementById('valAction').textContent = '—';
+  document.querySelectorAll('.var-box').forEach(el => el.classList.remove('active'));
+
+  const label = document.getElementById('stageLabel');
+  label.textContent = '等待开始';
+  label.style.borderColor = 'rgba(0,201,255,.3)'; label.style.color = '#00c9ff';
+
+  document.getElementById('stepInfo').innerHTML = `点击 <span class="hl-b">自动演示</span> 或 <span class="hl-y">单步</span> 开始。chars = [${currentChars.map(c => '"' + c + '"').join(', ')}]`;
+  document.querySelectorAll('.code-line').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.fl-node').forEach(el => el.classList.remove('active-fl'));
+}
+
+function stepForward() {
+  if (curStep === -1 && steps.length === 0) initViz();
+  if (curStep < steps.length - 1) { curStep++; renderStep(curStep); }
+}
+
+function getDelay() { return 1800 - document.getElementById('speedRange').value * 155; }
+
+function runAuto() {
+  if (playing) {
+    clearTimeout(autoTimer); playing = false;
+    document.getElementById('btnRun').textContent = '▶ 自动演示'; return;
+  }
+  if (curStep === -1 || curStep >= steps.length - 1) initViz();
+  playing = true;
+  document.getElementById('btnRun').textContent = '⏸ 暂停';
+  (function tick() {
+    if (curStep < steps.length - 1) {
+      curStep++; renderStep(curStep);
+      autoTimer = setTimeout(tick, getDelay());
+    } else {
+      playing = false;
+      document.getElementById('btnRun').textContent = '▶ 自动演示';
+    }
+  })();
+}
+
+function resetViz() {
+  clearTimeout(autoTimer); playing = false;
+  document.getElementById('btnRun').textContent = '▶ 自动演示';
+  initViz();
+}
+
+window.addEventListener('DOMContentLoaded', initViz);
+</script>
+</body>
+</html>

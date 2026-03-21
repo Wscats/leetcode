@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>反转字符串中的元音字母 - 交互式图解</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: linear-gradient(135deg, #0a0f1e, #152238, #0d1926);
+      min-height: 100vh;
+      color: #e8e8e8;
+      padding: 30px 20px;
+    }
+
+    .container { max-width: 1060px; margin: 0 auto; }
+
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 6px;
+      background: linear-gradient(90deg, #f7797d, #fbd786, #c6ffdd, #6dd5fa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #7a8ba0;
+      margin-bottom: 30px;
+      font-size: 0.92rem;
+    }
+
+    /* ===== Section Card ===== */
+    .section {
+      background: rgba(255,255,255,0.035);
+      border-radius: 16px;
+      padding: 24px 26px;
+      margin-bottom: 22px;
+      border: 1px solid rgba(255,255,255,0.06);
+      backdrop-filter: blur(6px);
+    }
+
+    .section h2 {
+      font-size: 1.12rem;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ===== Problem ===== */
+    .problem { line-height: 1.95; font-size: 0.93rem; color: #c8cdd5; }
+    .problem strong { color: #fbd786; }
+    .problem code {
+      background: rgba(251,215,134,0.1);
+      padding: 2px 8px;
+      border-radius: 4px;
+      color: #fbd786;
+      font-size: 0.86rem;
+      font-family: 'Fira Code', Consolas, monospace;
+    }
+
+    .example-box {
+      background: rgba(255,255,255,0.03);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-top: 14px;
+      border-left: 3px solid #6dd5fa;
+    }
+
+    .example-box p {
+      font-size: 0.86rem;
+      line-height: 1.8;
+      color: #b0b8c4;
+      font-family: 'Fira Code', Consolas, monospace;
+    }
+
+    .example-box p span.hl { color: #6dd5fa; font-weight: 600; }
+
+    /* ===== Idea Cards ===== */
+    .idea-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+    }
+
+    .idea-card {
+      background: rgba(255,255,255,0.025);
+      border-radius: 12px;
+      padding: 18px;
+      border-left: 3px solid;
+      transition: transform 0.2s;
+    }
+
+    .idea-card:hover { transform: translateY(-2px); }
+    .idea-card:nth-child(1) { border-color: #f7797d; }
+    .idea-card:nth-child(2) { border-color: #fbd786; }
+    .idea-card:nth-child(3) { border-color: #6dd5fa; }
+    .idea-card:nth-child(4) { border-color: #c6ffdd; }
+
+    .idea-card h3 { font-size: 0.92rem; margin-bottom: 8px; }
+    .idea-card p { font-size: 0.82rem; color: #a0aab5; line-height: 1.7; }
+    .idea-card code {
+      background: rgba(255,255,255,0.07);
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 0.8rem;
+      font-family: 'Fira Code', Consolas, monospace;
+    }
+
+    /* ===== Input & Controls ===== */
+    .input-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      justify-content: center;
+      margin-bottom: 14px;
+    }
+
+    .input-group { display: flex; flex-direction: column; gap: 5px; }
+    .input-group label { font-size: 0.78rem; color: #8899aa; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    .input-group input {
+      padding: 10px 16px;
+      border: 2px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.05);
+      color: #fff;
+      font-size: 1.05rem;
+      outline: none;
+      font-family: 'Fira Code', Consolas, monospace;
+      transition: border-color 0.3s;
+      width: 320px;
+      letter-spacing: 2px;
+    }
+
+    .input-group input:focus { border-color: #6dd5fa; }
+
+    .btn {
+      padding: 10px 22px;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.25s;
+      white-space: nowrap;
+    }
+
+    .btn:hover { transform: translateY(-2px); }
+
+    .btn-run { background: linear-gradient(135deg, #c6ffdd, #6dd5fa); color: #0a1628; }
+    .btn-run:hover { box-shadow: 0 6px 20px rgba(109,213,250,0.35); }
+
+    .btn-step { background: linear-gradient(135deg, #fbd786, #f7797d); color: #0a1628; }
+    .btn-step:hover { box-shadow: 0 6px 20px rgba(251,215,134,0.35); }
+
+    .btn-reset { background: rgba(255,255,255,0.07); color: #8899aa; }
+    .btn-reset:hover { background: rgba(255,255,255,0.12); color: #ccc; }
+
+    .speed-ctrl { display: flex; align-items: center; gap: 6px; }
+    .speed-ctrl label { font-size: 0.78rem; color: #8899aa; }
+    .speed-ctrl input[type="range"] { width: 90px; accent-color: #6dd5fa; }
+
+    .examples { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 14px; }
+
+    .ex-btn {
+      padding: 7px 16px;
+      border: 1.5px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      background: rgba(255,255,255,0.03);
+      color: #95a5b5;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Fira Code', Consolas, monospace;
+    }
+
+    .ex-btn:hover { border-color: #6dd5fa; color: #6dd5fa; background: rgba(109,213,250,0.06); }
+
+    /* ===== Code Block ===== */
+    .code-block {
+      font-family: 'Fira Code', Consolas, monospace;
+      font-size: 0.84rem;
+      line-height: 1.85;
+      overflow-x: auto;
+    }
+
+    .code-line {
+      padding: 2px 12px;
+      border-radius: 4px;
+      transition: background 0.35s, border-color 0.35s;
+      white-space: pre;
+      border-left: 3px solid transparent;
+    }
+
+    .code-line.active {
+      background: rgba(109,213,250,0.12);
+      border-left-color: #6dd5fa;
+    }
+
+    .kw { color: #c678dd; }
+    .fn { color: #61afef; }
+    .cm { color: #5c6370; font-style: italic; }
+    .vr { color: #e5c07b; }
+    .op { color: #56b6c2; }
+    .nm { color: #d19a66; }
+    .st { color: #98c379; }
+
+    .complexity {
+      margin-top: 18px;
+      padding: 14px 18px;
+      background: rgba(255,255,255,0.025);
+      border-radius: 10px;
+      display: flex;
+      gap: 36px;
+      flex-wrap: wrap;
+    }
+
+    .complexity span { font-size: 0.86rem; color: #a0aab5; }
+    .complexity strong { color: #6dd5fa; }
+
+    /* ===== Character Array Visualization ===== */
+    .char-array-wrap {
+      display: flex;
+      gap: 0;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 20px 0;
+      position: relative;
+    }
+
+    .char-cell {
+      width: 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0 3px;
+      transition: all 0.4s;
+      position: relative;
+    }
+
+    .char-cell .idx {
+      font-size: 0.65rem;
+      color: #4a5568;
+      margin-bottom: 4px;
+      font-family: 'Fira Code', Consolas, monospace;
+    }
+
+    .char-cell .box {
+      width: 52px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      font-size: 1.5rem;
+      font-weight: 700;
+      font-family: 'Fira Code', Consolas, monospace;
+      transition: all 0.4s;
+      background: rgba(255,255,255,0.02);
+      position: relative;
+    }
+
+    .char-cell .pointer-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      margin-top: 5px;
+      height: 18px;
+      transition: all 0.3s;
+    }
+
+    /* Vowel styling */
+    .char-cell.vowel .box {
+      background: rgba(247,121,125,0.1);
+      border-color: rgba(247,121,125,0.35);
+      color: #f7797d;
+    }
+
+    .char-cell.consonant .box {
+      color: #6a7585;
+    }
+
+    /* Pointer highlights */
+    .char-cell.left-ptr .box {
+      border-color: #6dd5fa;
+      box-shadow: 0 0 16px rgba(109,213,250,0.4);
+      transform: translateY(-4px);
+    }
+
+    .char-cell.right-ptr .box {
+      border-color: #fbd786;
+      box-shadow: 0 0 16px rgba(251,215,134,0.4);
+      transform: translateY(-4px);
+    }
+
+    .char-cell.both-ptr .box {
+      border-color: #c6ffdd;
+      box-shadow: 0 0 18px rgba(198,255,221,0.5);
+      transform: translateY(-5px);
+    }
+
+    .char-cell.swapping .box {
+      animation: swapPulse 0.5s ease-in-out;
+      border-color: #c6ffdd;
+      box-shadow: 0 0 24px rgba(198,255,221,0.6);
+      background: rgba(198,255,221,0.1);
+    }
+
+    .char-cell.swapped .box {
+      background: rgba(198,255,221,0.08);
+      border-color: rgba(198,255,221,0.3);
+    }
+
+    @keyframes swapPulse {
+      0% { transform: scale(1) translateY(-4px); }
+      30% { transform: scale(1.2) translateY(-8px); }
+      60% { transform: scale(0.95) translateY(-2px); }
+      100% { transform: scale(1) translateY(-4px); }
+    }
+
+    /* Swap arrow */
+    .swap-arrow {
+      position: absolute;
+      top: -24px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 1.1rem;
+      color: #c6ffdd;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+
+    .swap-arrow.show { opacity: 1; }
+
+    /* ===== Step Info & Status ===== */
+    .status-row {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .status-box {
+      padding: 12px 24px;
+      border-radius: 12px;
+      text-align: center;
+      min-width: 140px;
+    }
+
+    .status-box .s-label {
+      font-size: 0.76rem;
+      color: #7a8a9a;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-box .s-val {
+      font-size: 1.4rem;
+      font-weight: 800;
+      font-family: 'Fira Code', Consolas, monospace;
+    }
+
+    .status-box.left-box {
+      background: rgba(109,213,250,0.08);
+      border: 1.5px solid rgba(109,213,250,0.25);
+    }
+    .status-box.left-box .s-val { color: #6dd5fa; }
+
+    .status-box.right-box {
+      background: rgba(251,215,134,0.08);
+      border: 1.5px solid rgba(251,215,134,0.25);
+    }
+    .status-box.right-box .s-val { color: #fbd786; }
+
+    .status-box.swap-box {
+      background: rgba(198,255,221,0.08);
+      border: 1.5px solid rgba(198,255,221,0.25);
+    }
+    .status-box.swap-box .s-val { color: #c6ffdd; }
+
+    .step-info {
+      padding: 14px 20px;
+      background: rgba(255,255,255,0.035);
+      border-radius: 10px;
+      font-size: 0.9rem;
+      color: #c8cdd5;
+      line-height: 1.8;
+      min-height: 52px;
+    }
+
+    .hl-l { color: #6dd5fa; font-weight: 600; }
+    .hl-r { color: #fbd786; font-weight: 600; }
+    .hl-g { color: #c6ffdd; font-weight: 600; }
+    .hl-p { color: #f7797d; font-weight: 600; }
+    .hl-v { color: #c678dd; font-weight: 600; }
+
+    /* Result banner */
+    .result-banner {
+      margin-top: 16px;
+      padding: 18px 26px;
+      border-radius: 12px;
+      text-align: center;
+      display: none;
+      background: rgba(198,255,221,0.1);
+      border: 2px solid rgba(198,255,221,0.3);
+    }
+
+    .result-banner .result-label {
+      font-size: 0.82rem;
+      color: #8899aa;
+      margin-bottom: 6px;
+    }
+
+    .result-banner .result-val {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #c6ffdd;
+      font-family: 'Fira Code', Consolas, monospace;
+      letter-spacing: 3px;
+    }
+
+    .result-banner .result-detail {
+      font-size: 0.84rem;
+      color: #8a9aaa;
+      margin-top: 8px;
+    }
+
+    /* ===== Vowel legend ===== */
+    .vowel-legend {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      color: #8a9aaa;
+    }
+
+    .legend-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 4px;
+    }
+
+    .legend-dot.v-dot { background: rgba(247,121,125,0.35); border: 1.5px solid #f7797d; }
+    .legend-dot.c-dot { background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.15); }
+    .legend-dot.l-dot { background: rgba(109,213,250,0.2); border: 1.5px solid #6dd5fa; }
+    .legend-dot.r-dot { background: rgba(251,215,134,0.2); border: 1.5px solid #fbd786; }
+    .legend-dot.s-dot { background: rgba(198,255,221,0.2); border: 1.5px solid #c6ffdd; }
+
+    /* ===== Flowchart ===== */
+    .flowchart {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    .fl-node {
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      text-align: center;
+      max-width: 440px;
+      transition: all 0.35s;
+    }
+
+    .fl-node.start {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 28px;
+    }
+
+    .fl-node.process {
+      background: rgba(109,213,250,0.08);
+      border: 2px solid rgba(109,213,250,0.2);
+    }
+
+    .fl-node.decision {
+      background: rgba(251,215,134,0.06);
+      border: 2px solid rgba(251,215,134,0.2);
+    }
+
+    .fl-node.action {
+      background: rgba(198,255,221,0.06);
+      border: 2px solid rgba(198,255,221,0.2);
+    }
+
+    .fl-node.end {
+      background: linear-gradient(135deg, #11998e, #38ef7d);
+      border-radius: 28px;
+      color: #000;
+    }
+
+    .fl-node.active-fl {
+      box-shadow: 0 0 22px rgba(251,215,134,0.45);
+      border-color: #fbd786 !important;
+    }
+
+    .fl-arrow {
+      width: 2px;
+      height: 18px;
+      background: rgba(255,255,255,0.12);
+      position: relative;
+    }
+
+    .fl-arrow::after {
+      content: '▼';
+      position: absolute;
+      bottom: -9px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.55rem;
+      color: rgba(255,255,255,0.2);
+    }
+
+    .fl-branch {
+      display: flex;
+      gap: 40px;
+      justify-content: center;
+      margin-top: 4px;
+    }
+
+    .fl-branch-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    .fl-branch-label {
+      font-size: 0.74rem;
+      color: #7a8a9a;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔤 反转字符串中的元音字母</h1>
+    <p class="subtitle">LeetCode 345 · Reverse Vowels of a String</p>
+
+    <!-- Problem Description -->
+    <div class="section">
+      <h2 style="color:#f7797d;">📋 题目描述</h2>
+      <div class="problem">
+        给你一个字符串 <code>s</code>，仅反转字符串中的所有 <strong>元音字母</strong>，并返回结果字符串。<br><br>
+        元音字母包括：<code>a</code> <code>e</code> <code>i</code> <code>o</code> <code>u</code>（大小写均算）。<br><br>
+        <div class="example-box">
+          <p><span class="hl">示例 1：</span>输入 s = "IceCreAm" → 输出 "AcesreIm"</p>
+          <p><span class="hl">示例 2：</span>输入 s = "leetcode" → 输出 "leotcede"</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Core Idea -->
+    <div class="section">
+      <h2 style="color:#fbd786;">💡 核心思路 — 双指针对撞</h2>
+      <div class="idea-grid">
+        <div class="idea-card">
+          <h3 style="color:#f7797d;">① 识别元音</h3>
+          <p>将 <code>aeiouAEIOU</code> 存入集合 Set，用于 O(1) 判断某字符是否为元音字母。</p>
+        </div>
+        <div class="idea-card">
+          <h3 style="color:#fbd786;">② 双指针对撞</h3>
+          <p>左指针 <code>left</code> 从头、右指针 <code>right</code> 从尾出发，向中间逼近，直到相遇。</p>
+        </div>
+        <div class="idea-card">
+          <h3 style="color:#6dd5fa;">③ 跳过辅音</h3>
+          <p>左指针遇到辅音就右移，右指针遇到辅音就左移，直到两端都指向元音。</p>
+        </div>
+        <div class="idea-card">
+          <h3 style="color:#c6ffdd;">④ 交换元音</h3>
+          <p>当左右指针都指向元音时，交换两者位置的字符，然后同时向中间收缩。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="section">
+      <h2 style="color:#6dd5fa;">🎮 交互控制</h2>
+      <div class="examples">
+        <button class="ex-btn" onclick="loadEx('IceCreAm')">示例1: "IceCreAm"</button>
+        <button class="ex-btn" onclick="loadEx('leetcode')">示例2: "leetcode"</button>
+        <button class="ex-btn" onclick="loadEx('hello')">hello</button>
+        <button class="ex-btn" onclick="loadEx('aA')">边界: "aA"</button>
+        <button class="ex-btn" onclick="loadEx('xyz')">无元音: "xyz"</button>
+        <button class="ex-btn" onclick="loadEx('aeiou')">全元音: "aeiou"</button>
+      </div>
+      <div class="input-row">
+        <div class="input-group">
+          <label>输入字符串 s</label>
+          <input type="text" id="sInput" value="IceCreAm" placeholder="如 IceCreAm">
+        </div>
+        <button class="btn btn-run" onclick="runAuto()">▶ 自动演示</button>
+        <button class="btn btn-step" onclick="stepForward()">⏭ 单步</button>
+        <button class="btn btn-reset" onclick="resetViz()">↺ 重置</button>
+        <div class="speed-ctrl">
+          <label>速度</label>
+          <input type="range" id="speedRange" min="1" max="10" value="5">
+        </div>
+      </div>
+    </div>
+
+    <!-- Code -->
+    <div class="section">
+      <h2 style="color:#c6ffdd;">💻 JavaScript 代码</h2>
+      <div class="code-block">
+        <div class="code-line" data-line="0"><span class="kw">function</span> <span class="fn">reverseVowels</span>(<span class="vr">s</span>) {</div>
+        <div class="code-line" data-line="1">  <span class="kw">const</span> <span class="vr">vowels</span> = <span class="kw">new</span> <span class="fn">Set</span>(<span class="st">'aeiouAEIOU'</span>);</div>
+        <div class="code-line" data-line="2">  <span class="kw">const</span> <span class="vr">arr</span> = <span class="vr">s</span>.<span class="fn">split</span>(<span class="st">''</span>);</div>
+        <div class="code-line" data-line="3">  <span class="kw">let</span> <span class="vr">left</span> = <span class="nm">0</span>, <span class="vr">right</span> = <span class="vr">arr</span>.<span class="vr">length</span> - <span class="nm">1</span>;</div>
+        <div class="code-line" data-line="4">  <span class="kw">while</span> (<span class="vr">left</span> <span class="op">&lt;</span> <span class="vr">right</span>) {</div>
+        <div class="code-line" data-line="5">    <span class="kw">while</span> (<span class="vr">left</span> <span class="op">&lt;</span> <span class="vr">right</span> &amp;&amp; !<span class="vr">vowels</span>.<span class="fn">has</span>(<span class="vr">arr</span>[<span class="vr">left</span>]))</div>
+        <div class="code-line" data-line="6">      <span class="vr">left</span>++; <span class="cm">// skip consonant on left</span></div>
+        <div class="code-line" data-line="7">    <span class="kw">while</span> (<span class="vr">left</span> <span class="op">&lt;</span> <span class="vr">right</span> &amp;&amp; !<span class="vr">vowels</span>.<span class="fn">has</span>(<span class="vr">arr</span>[<span class="vr">right</span>]))</div>
+        <div class="code-line" data-line="8">      <span class="vr">right</span>--; <span class="cm">// skip consonant on right</span></div>
+        <div class="code-line" data-line="9">    [<span class="vr">arr</span>[<span class="vr">left</span>], <span class="vr">arr</span>[<span class="vr">right</span>]] = [<span class="vr">arr</span>[<span class="vr">right</span>], <span class="vr">arr</span>[<span class="vr">left</span>]];</div>
+        <div class="code-line" data-line="10">    <span class="vr">left</span>++;</div>
+        <div class="code-line" data-line="11">    <span class="vr">right</span>--;</div>
+        <div class="code-line" data-line="12">  }</div>
+        <div class="code-line" data-line="13">  <span class="kw">return</span> <span class="vr">arr</span>.<span class="fn">join</span>(<span class="st">''</span>);</div>
+        <div class="code-line" data-line="14">}</div>
+      </div>
+      <div class="complexity">
+        <span>时间复杂度：<strong>O(n)</strong> — 双指针各走一遍</span>
+        <span>空间复杂度：<strong>O(n)</strong> — 字符数组</span>
+      </div>
+    </div>
+
+    <!-- Visualization -->
+    <div class="section">
+      <h2 style="color:#f7797d;">🎨 动画图解</h2>
+
+      <div class="vowel-legend">
+        <div class="legend-item"><div class="legend-dot v-dot"></div>元音字母</div>
+        <div class="legend-item"><div class="legend-dot c-dot"></div>辅音字母</div>
+        <div class="legend-item"><div class="legend-dot l-dot"></div>left 指针</div>
+        <div class="legend-item"><div class="legend-dot r-dot"></div>right 指针</div>
+        <div class="legend-item"><div class="legend-dot s-dot"></div>已交换</div>
+      </div>
+
+      <!-- Status -->
+      <div class="status-row">
+        <div class="status-box left-box">
+          <div class="s-label">Left 指针</div>
+          <div class="s-val" id="leftVal">0</div>
+        </div>
+        <div class="status-box right-box">
+          <div class="s-label">Right 指针</div>
+          <div class="s-val" id="rightVal">0</div>
+        </div>
+        <div class="status-box swap-box">
+          <div class="s-label">交换次数</div>
+          <div class="s-val" id="swapCount">0</div>
+        </div>
+      </div>
+
+      <!-- Char Array -->
+      <div id="swapArrow" class="swap-arrow">⟵ 交换 ⟶</div>
+      <div class="char-array-wrap" id="charArray"></div>
+
+      <!-- Step Info -->
+      <div class="step-info" id="stepInfo">
+        点击 <span class="hl-g">自动演示</span> 或 <span class="hl-r">单步</span> 开始可视化。
+      </div>
+
+      <!-- Result -->
+      <div class="result-banner" id="resultBanner">
+        <div class="result-label">✅ 最终结果</div>
+        <div class="result-val" id="resultVal"></div>
+        <div class="result-detail" id="resultDetail"></div>
+      </div>
+    </div>
+
+    <!-- Flowchart -->
+    <div class="section">
+      <h2 style="color:#fbd786;">📊 算法流程图</h2>
+      <div class="flowchart">
+        <div class="fl-node start" id="fl-start">开始：输入字符串 s</div>
+        <div class="fl-arrow"></div>
+        <div class="fl-node process" id="fl-init">转为数组，left = 0，right = len - 1</div>
+        <div class="fl-arrow"></div>
+        <div class="fl-node decision" id="fl-loop">left < right ?</div>
+        <div class="fl-arrow"></div>
+        <div class="fl-branch">
+          <div class="fl-branch-col">
+            <div class="fl-branch-label">✅ 是</div>
+            <div class="fl-node process" id="fl-skip-left">左指针跳过辅音 → left++</div>
+            <div class="fl-arrow"></div>
+            <div class="fl-node process" id="fl-skip-right">右指针跳过辅音 → right--</div>
+            <div class="fl-arrow"></div>
+            <div class="fl-node decision" id="fl-check">两端都是元音？</div>
+            <div class="fl-arrow"></div>
+            <div class="fl-node action" id="fl-swap">交换 arr[left] ↔ arr[right]</div>
+            <div class="fl-arrow"></div>
+            <div class="fl-node process" id="fl-move">left++, right-- → 回到循环</div>
+          </div>
+          <div class="fl-branch-col">
+            <div class="fl-branch-label">❌ 否（指针相遇）</div>
+            <div class="fl-node end" id="fl-end">返回 arr.join('') 🎉</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== Constants =====
+    const VOWELS = new Set('aeiouAEIOU');
+
+    // ===== State =====
+    let steps = [];
+    let curStep = -1;
+    let autoTimer = null;
+    let playing = false;
+
+    // ===== Load example =====
+    function loadEx(str) {
+      document.getElementById('sInput').value = str;
+      resetViz();
+    }
+
+    // ===== Generate all visualization steps =====
+    function genSteps(s) {
+      const stepsArr = [];
+      const arr = s.split('');
+      const n = arr.length;
+      let left = 0, right = n - 1;
+      let swaps = 0;
+      const swappedSet = new Set(); // track swapped indices
+
+      // Step: init
+      stepsArr.push({
+        type: 'init',
+        arr: [...arr], left: 0, right: n - 1, swaps: 0,
+        swappedSet: new Set(),
+        codeLine: 3,
+        flowId: 'fl-init',
+        info: `初始化：将 "<span class="hl-v">${s}</span>" 转为字符数组，<span class="hl-l">left = 0</span>，<span class="hl-r">right = ${n - 1}</span>。`
+      });
+
+      while (left < right) {
+        // Skip left consonants
+        const leftStart = left;
+        while (left < right && !VOWELS.has(arr[left])) {
+          left++;
+        }
+        if (left > leftStart) {
+          const skipped = arr.slice(leftStart, left).map(c => `'${c}'`).join(', ');
+          stepsArr.push({
+            type: 'skip-left',
+            arr: [...arr], left, right, swaps,
+            skippedFrom: leftStart, skippedTo: left - 1,
+            swappedSet: new Set(swappedSet),
+            codeLine: 5,
+            flowId: 'fl-skip-left',
+            info: `<span class="hl-l">left 指针</span> 从 ${leftStart} 跳过辅音 ${skipped}，停在位置 <span class="hl-l">${left}</span>` +
+                  (left < n ? `（字符 '<span class="hl-p">${arr[left]}</span>'${VOWELS.has(arr[left]) ? ' 是元音 ✅' : ''}）` : '。')
+          });
+        } else if (VOWELS.has(arr[left])) {
+          stepsArr.push({
+            type: 'found-left',
+            arr: [...arr], left, right, swaps,
+            swappedSet: new Set(swappedSet),
+            codeLine: 5,
+            flowId: 'fl-skip-left',
+            info: `<span class="hl-l">left = ${left}</span>：字符 '<span class="hl-p">${arr[left]}</span>' 是元音 ✅，无需跳过。`
+          });
+        }
+
+        // Skip right consonants
+        const rightStart = right;
+        while (left < right && !VOWELS.has(arr[right])) {
+          right--;
+        }
+        if (right < rightStart) {
+          const skipped = arr.slice(right + 1, rightStart + 1).reverse().map(c => `'${c}'`).join(', ');
+          stepsArr.push({
+            type: 'skip-right',
+            arr: [...arr], left, right, swaps,
+            skippedFrom: rightStart, skippedTo: right + 1,
+            swappedSet: new Set(swappedSet),
+            codeLine: 7,
+            flowId: 'fl-skip-right',
+            info: `<span class="hl-r">right 指针</span> 从 ${rightStart} 跳过辅音 ${skipped}，停在位置 <span class="hl-r">${right}</span>` +
+                  (right >= 0 ? `（字符 '<span class="hl-p">${arr[right]}</span>'${VOWELS.has(arr[right]) ? ' 是元音 ✅' : ''}）` : '。')
+          });
+        } else if (VOWELS.has(arr[right])) {
+          stepsArr.push({
+            type: 'found-right',
+            arr: [...arr], left, right, swaps,
+            swappedSet: new Set(swappedSet),
+            codeLine: 7,
+            flowId: 'fl-skip-right',
+            info: `<span class="hl-r">right = ${right}</span>：字符 '<span class="hl-p">${arr[right]}</span>' 是元音 ✅，无需跳过。`
+          });
+        }
+
+        // Check and swap
+        if (left < right) {
+          const lChar = arr[left];
+          const rChar = arr[right];
+          // Swap
+          [arr[left], arr[right]] = [arr[right], arr[left]];
+          swaps++;
+          swappedSet.add(left);
+          swappedSet.add(right);
+
+          stepsArr.push({
+            type: 'swap',
+            arr: [...arr], left, right, swaps,
+            lChar, rChar,
+            swappedSet: new Set(swappedSet),
+            codeLine: 9,
+            flowId: 'fl-swap',
+            info: `🔄 交换！<span class="hl-l">arr[${left}]</span> = '<span class="hl-p">${lChar}</span>' ↔ <span class="hl-r">arr[${right}]</span> = '<span class="hl-p">${rChar}</span>'` +
+                  ` → 第 <span class="hl-g">${swaps}</span> 次交换完成。`
+          });
+
+          left++;
+          right--;
+
+          stepsArr.push({
+            type: 'move',
+            arr: [...arr], left, right, swaps,
+            swappedSet: new Set(swappedSet),
+            codeLine: 10,
+            flowId: 'fl-move',
+            info: `指针收缩：<span class="hl-l">left → ${left}</span>，<span class="hl-r">right → ${right}</span>` +
+                  (left >= right ? '。指针相遇/交叉，即将结束循环。' : '，继续下一轮。')
+          });
+        } else {
+          break;
+        }
+      }
+
+      // Final
+      const result = arr.join('');
+      stepsArr.push({
+        type: 'done',
+        arr: [...arr], left, right, swaps, result,
+        swappedSet: new Set(swappedSet),
+        codeLine: 13,
+        flowId: 'fl-end',
+        info: `✅ 完成！共交换 <span class="hl-g">${swaps}</span> 次，结果为 "<span class="hl-g">${result}</span>"。`
+      });
+
+      return stepsArr;
+    }
+
+    // ===== Render character array =====
+    function renderCharArray(arr, left, right, swappedSet, stepType) {
+      const wrap = document.getElementById('charArray');
+      wrap.innerHTML = '';
+
+      for (let i = 0; i < arr.length; i++) {
+        const cell = document.createElement('div');
+        const ch = arr[i];
+        const isVowel = VOWELS.has(ch);
+        const isLeft = (i === left);
+        const isRight = (i === right);
+        const isBoth = isLeft && isRight;
+        const isSwapped = swappedSet && swappedSet.has(i);
+        const isSwapping = stepType === 'swap' && (isLeft || isRight);
+
+        let classes = 'char-cell';
+        if (isVowel) classes += ' vowel';
+        else classes += ' consonant';
+
+        if (isSwapping) classes += ' swapping';
+        else if (isBoth) classes += ' both-ptr';
+        else if (isLeft) classes += ' left-ptr';
+        else if (isRight) classes += ' right-ptr';
+        else if (isSwapped) classes += ' swapped';
+
+        cell.className = classes;
+        cell.id = `cell-${i}`;
+
+        let ptrText = '';
+        if (isBoth) ptrText = '<span style="color:#c6ffdd">L=R</span>';
+        else if (isLeft) ptrText = '<span style="color:#6dd5fa">L ⬆</span>';
+        else if (isRight) ptrText = '<span style="color:#fbd786">R ⬆</span>';
+
+        cell.innerHTML = `
+          <div class="idx">${i}</div>
+          <div class="box">${ch}</div>
+          <div class="pointer-label">${ptrText}</div>
+        `;
+        wrap.appendChild(cell);
+      }
+    }
+
+    // ===== Render a step =====
+    function renderStep(idx) {
+      if (idx < 0 || idx >= steps.length) return;
+      const step = steps[idx];
+
+      // Clear highlights
+      document.querySelectorAll('.code-line').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.fl-node').forEach(el => el.classList.remove('active-fl'));
+
+      // Code highlight
+      const cl = document.querySelector(`.code-line[data-line="${step.codeLine}"]`);
+      if (cl) cl.classList.add('active');
+
+      // Flow highlight
+      const fn = document.getElementById(step.flowId);
+      if (fn) fn.classList.add('active-fl');
+
+      // Status
+      document.getElementById('leftVal').textContent = step.left;
+      document.getElementById('rightVal').textContent = step.right;
+      document.getElementById('swapCount').textContent = step.swaps;
+
+      // Info
+      document.getElementById('stepInfo').innerHTML =
+        `<strong>步骤 ${idx + 1}/${steps.length}：</strong>${step.info}`;
+
+      // Char array
+      renderCharArray(step.arr, step.left, step.right, step.swappedSet, step.type);
+
+      // Swap arrow
+      const arrow = document.getElementById('swapArrow');
+      arrow.classList.toggle('show', step.type === 'swap');
+
+      // Result
+      const banner = document.getElementById('resultBanner');
+      if (step.type === 'done') {
+        banner.style.display = 'block';
+        document.getElementById('resultVal').textContent = `"${step.result}"`;
+        document.getElementById('resultDetail').textContent =
+          `原始输入 "${document.getElementById('sInput').value.trim()}" → 交换了 ${step.swaps} 对元音`;
+      } else {
+        banner.style.display = 'none';
+      }
+    }
+
+    // ===== Controls =====
+    function initViz() {
+      const s = document.getElementById('sInput').value.trim() || 'IceCreAm';
+      steps = genSteps(s);
+      curStep = -1;
+
+      const arr = s.split('');
+      renderCharArray(arr, 0, arr.length - 1, new Set(), 'init');
+      document.getElementById('leftVal').textContent = '0';
+      document.getElementById('rightVal').textContent = arr.length - 1;
+      document.getElementById('swapCount').textContent = '0';
+      document.getElementById('stepInfo').innerHTML =
+        `点击 <span class="hl-g">自动演示</span> 或 <span class="hl-r">单步</span> 开始。输入 = "<span class="hl-v">${s}</span>"`;
+      document.getElementById('resultBanner').style.display = 'none';
+      document.querySelectorAll('.code-line').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.fl-node').forEach(el => el.classList.remove('active-fl'));
+    }
+
+    function stepForward() {
+      if (curStep === -1 && steps.length === 0) initViz();
+      if (curStep < steps.length - 1) {
+        curStep++;
+        renderStep(curStep);
+      }
+    }
+
+    function getDelay() {
+      const v = document.getElementById('speedRange').value;
+      return 1800 - v * 155;
+    }
+
+    function runAuto() {
+      if (playing) {
+        clearTimeout(autoTimer);
+        playing = false;
+        document.querySelector('.btn-run').textContent = '▶ 自动演示';
+        return;
+      }
+
+      if (curStep === -1 || curStep >= steps.length - 1) initViz();
+      playing = true;
+      document.querySelector('.btn-run').textContent = '⏸ 暂停';
+
+      function tick() {
+        if (curStep < steps.length - 1) {
+          curStep++;
+          renderStep(curStep);
+          autoTimer = setTimeout(tick, getDelay());
+        } else {
+          playing = false;
+          document.querySelector('.btn-run').textContent = '▶ 自动演示';
+        }
+      }
+      tick();
+    }
+
+    function resetViz() {
+      clearTimeout(autoTimer);
+      playing = false;
+      document.querySelector('.btn-run').textContent = '▶ 自动演示';
+      initViz();
+    }
+
+    // Init on load
+    window.addEventListener('DOMContentLoaded', initViz);
+  </script>
+</body>
+</html>

@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>除自身以外数组的乘积 - 交互式图解</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;background:linear-gradient(135deg,#080e1a 0%,#101b30 50%,#0b1422 100%);min-height:100vh;color:#e0e0e0;padding:28px 18px}
+.container{max-width:1100px;margin:0 auto}
+h1{text-align:center;font-size:2rem;margin-bottom:4px;background:linear-gradient(90deg,#f7971e,#ffd200,#f7971e,#ff6b6b);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.subtitle{text-align:center;color:#6d7f94;font-size:.9rem;margin-bottom:30px}
+
+/* Section */
+.section{background:rgba(255,255,255,.028);border:1px solid rgba(255,255,255,.055);border-radius:16px;padding:24px 26px;margin-bottom:20px;backdrop-filter:blur(4px)}
+.section h2{font-size:1.1rem;margin-bottom:15px;display:flex;align-items:center;gap:8px}
+
+/* Problem */
+.problem{line-height:2;font-size:.92rem;color:#bcc6d2}
+.problem strong{color:#ffd200}
+.problem code{background:rgba(255,210,0,.08);padding:2px 7px;border-radius:5px;color:#ffd200;font-size:.83rem;font-family:'Fira Code',Consolas,monospace}
+.ex-box{background:rgba(255,255,255,.02);border-left:3px solid #f7971e;border-radius:0 10px 10px 0;padding:13px 17px;margin-top:12px;margin-bottom:8px}
+.ex-box p{font-size:.84rem;line-height:1.9;color:#a0acb8;font-family:'Fira Code',Consolas,monospace}
+.ex-box .hl{color:#f7971e;font-weight:600}
+
+/* Idea cards */
+.idea-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:13px}
+.idea-card{background:rgba(255,255,255,.018);border-radius:12px;padding:18px;border-left:3px solid;transition:transform .22s}
+.idea-card:hover{transform:translateY(-3px)}
+.idea-card:nth-child(1){border-color:#f7971e}
+.idea-card:nth-child(2){border-color:#00c9ff}
+.idea-card:nth-child(3){border-color:#ff6b6b}
+.idea-card h3{font-size:.92rem;margin-bottom:8px}
+.idea-card p{font-size:.8rem;color:#96a3b1;line-height:1.75}
+.idea-card code{background:rgba(255,255,255,.06);padding:1px 5px;border-radius:3px;font-size:.76rem;font-family:'Fira Code',Consolas,monospace}
+
+/* Controls */
+.examples-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:13px}
+.ex-btn{padding:7px 15px;border:1.5px solid rgba(255,255,255,.08);border-radius:8px;background:rgba(255,255,255,.022);color:#90a0b2;font-size:.82rem;cursor:pointer;transition:all .2s;font-family:'Fira Code',Consolas,monospace}
+.ex-btn:hover{border-color:#f7971e;color:#f7971e;background:rgba(247,151,30,.06)}
+.ctrl-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:center;margin-bottom:0}
+.btn{padding:10px 22px;border:none;border-radius:10px;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .22s;white-space:nowrap}
+.btn:hover{transform:translateY(-2px)}
+.btn-run{background:linear-gradient(135deg,#f7971e,#ffd200);color:#0a1628}
+.btn-run:hover{box-shadow:0 6px 20px rgba(247,151,30,.35)}
+.btn-step{background:linear-gradient(135deg,#00c9ff,#92fe9d);color:#0a1628}
+.btn-step:hover{box-shadow:0 6px 20px rgba(0,201,255,.35)}
+.btn-reset{background:rgba(255,255,255,.06);color:#7a8d9f}
+.btn-reset:hover{background:rgba(255,255,255,.1);color:#bbb}
+.speed-ctrl{display:flex;align-items:center;gap:6px}
+.speed-ctrl label{font-size:.76rem;color:#7a8d9f}
+.speed-ctrl input[type=range]{width:86px;accent-color:#f7971e}
+
+/* Code */
+.code-block{font-family:'Fira Code',Consolas,monospace;font-size:.82rem;line-height:1.88;overflow-x:auto}
+.code-line{padding:2px 12px;border-radius:4px;transition:background .35s,border-color .35s;white-space:pre;border-left:3px solid transparent}
+.code-line.active{background:rgba(247,151,30,.12);border-left-color:#f7971e}
+.kw{color:#c678dd}.fn{color:#61afef}.cm{color:#5c6370;font-style:italic}.vr{color:#e5c07b}.op{color:#56b6c2}.st{color:#98c379}.nm{color:#d19a66}
+.complexity{margin-top:16px;padding:13px 16px;background:rgba(255,255,255,.02);border-radius:10px;display:flex;gap:36px;flex-wrap:wrap}
+.complexity span{font-size:.84rem;color:#96a3b1}
+.complexity strong{color:#f7971e}
+
+/* ===== Visualization ===== */
+.viz-stage-label{text-align:center;font-size:.92rem;font-weight:700;margin-bottom:14px;padding:10px 20px;border-radius:10px;display:inline-block}
+.viz-stage-wrap{text-align:center;margin-bottom:14px}
+
+/* Array display */
+.arr-row{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin:10px 0;min-height:46px;align-items:flex-end}
+.arr-label{font-size:.75rem;font-weight:700;color:#5a6b80;width:100%;text-align:left;padding-left:8px;margin-bottom:2px;letter-spacing:.5px}
+.cell{display:flex;flex-direction:column;align-items:center;gap:3px;transition:all .4s}
+.cell .c-idx{font-size:.58rem;color:#3a4a5a;font-family:'Fira Code',Consolas,monospace}
+.cell .c-box{min-width:52px;height:46px;display:flex;align-items:center;justify-content:center;border:1.5px solid rgba(255,255,255,.08);border-radius:8px;font-size:1.05rem;font-family:'Fira Code',Consolas,monospace;font-weight:700;padding:0 8px;transition:all .4s;background:rgba(255,255,255,.015)}
+
+/* Colors */
+.cell.hl-src .c-box{border-color:rgba(247,151,30,.5);background:rgba(247,151,30,.08);color:#ffd200}
+.cell.hl-left .c-box{border-color:rgba(0,201,255,.5);background:rgba(0,201,255,.08);color:#00c9ff}
+.cell.hl-right .c-box{border-color:rgba(255,107,107,.5);background:rgba(255,107,107,.08);color:#ff6b6b}
+.cell.hl-result .c-box{border-color:rgba(132,250,176,.5);background:rgba(132,250,176,.08);color:#84fab0}
+.cell.hl-current .c-box{border-color:#ffd200;box-shadow:0 0 14px rgba(255,210,0,.35);background:rgba(255,210,0,.12)}
+.cell.hl-multiply .c-box{animation:cellPulse .5s ease-in-out}
+
+@keyframes cellPulse{0%{transform:scale(1)}40%{transform:scale(1.15)}100%{transform:scale(1)}}
+
+/* Formula display */
+.formula-panel{padding:16px 22px;background:rgba(255,255,255,.025);border-radius:12px;margin:14px 0;text-align:center;font-family:'Fira Code',Consolas,monospace;font-size:.92rem;min-height:54px;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;line-height:1.8;transition:all .3s}
+.f-label{font-size:.72rem;font-weight:700;color:#5a6b80;padding:3px 10px;border-radius:6px;background:rgba(255,255,255,.03)}
+.f-val{font-weight:700}
+.f-orange{color:#f7971e}.f-blue{color:#00c9ff}.f-red{color:#ff6b6b}.f-green{color:#84fab0}.f-white{color:#fff}
+
+/* Bar chart for answer */
+.bar-chart{display:flex;justify-content:center;align-items:flex-end;gap:10px;height:160px;padding:0 20px;margin:18px 0}
+.bar-col{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;max-width:72px}
+.bar{width:100%;border-radius:6px 6px 0 0;transition:height .5s ease,background .4s;min-height:2px}
+.bar-val{font-size:.72rem;font-family:'Fira Code',Consolas,monospace;font-weight:700;color:#fff;transition:all .3s}
+.bar-idx{font-size:.7rem;color:#5a6b80;font-family:'Fira Code',Consolas,monospace}
+
+/* Pointer arrows */
+.pointer-row{display:flex;justify-content:center;gap:6px;min-height:30px;align-items:center;margin:4px 0}
+.ptr{font-size:.72rem;font-weight:800;padding:3px 10px;border-radius:6px;transition:all .4s;opacity:0;font-family:'Fira Code',Consolas,monospace}
+.ptr.show{opacity:1}
+.ptr-i{background:rgba(0,201,255,.12);color:#00c9ff;border:1px solid rgba(0,201,255,.3)}
+.ptr-j{background:rgba(255,107,107,.12);color:#ff6b6b;border:1px solid rgba(255,107,107,.3)}
+
+/* Step info */
+.step-info{padding:14px 20px;background:rgba(255,255,255,.028);border-radius:10px;font-size:.88rem;color:#bcc6d0;line-height:1.85;min-height:50px;margin-top:14px}
+.hl-o{color:#f7971e;font-weight:600}.hl-b{color:#00c9ff;font-weight:600}.hl-r{color:#ff6b6b;font-weight:600}.hl-g{color:#84fab0;font-weight:600}.hl-w{color:#fff;font-weight:700}.hl-y{color:#ffd200;font-weight:600}
+
+/* Result banner */
+.result-banner{margin-top:16px;padding:20px 26px;border-radius:14px;text-align:center;display:none;background:rgba(132,250,176,.07);border:2px solid rgba(132,250,176,.25)}
+.result-banner .r-label{font-size:.82rem;color:#7a8d9f;margin-bottom:6px}
+.result-banner .r-val{font-size:1.45rem;font-weight:800;color:#84fab0;font-family:'Fira Code',Consolas,monospace;letter-spacing:2px}
+
+/* Flowchart */
+.flowchart{display:flex;flex-direction:column;align-items:center;gap:0}
+.fl-node{padding:12px 24px;border-radius:12px;font-size:.83rem;font-weight:600;text-align:center;max-width:460px;transition:all .35s}
+.fl-node.start{background:linear-gradient(135deg,#667eea,#764ba2);border-radius:28px}
+.fl-node.process{background:rgba(0,201,255,.06);border:2px solid rgba(0,201,255,.18)}
+.fl-node.action{background:rgba(255,107,107,.05);border:2px solid rgba(255,107,107,.18)}
+.fl-node.end{background:linear-gradient(135deg,#11998e,#38ef7d);border-radius:28px;color:#000}
+.fl-node.active-fl{box-shadow:0 0 22px rgba(255,210,0,.4);border-color:#ffd200 !important}
+.fl-arrow{width:2px;height:16px;background:rgba(255,255,255,.08);position:relative}
+.fl-arrow::after{content:'▼';position:absolute;bottom:-9px;left:50%;transform:translateX(-50%);font-size:.5rem;color:rgba(255,255,255,.15)}
+
+/* Multiply animation overlay */
+.multiply-overlay{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999}
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>🧮 除自身以外数组的乘积</h1>
+<p class="subtitle">LeetCode 238 · Product of Array Except Self</p>
+
+<!-- Problem -->
+<div class="section">
+  <h2 style="color:#ffd200">📋 题目描述</h2>
+  <div class="problem">
+    给你一个整数数组 <code>nums</code>，返回数组 <code>answer</code>，其中 <code>answer[i]</code> 等于 <code>nums</code> 中除 <code>nums[i]</code> 之外其余各元素的乘积。<br><br>
+    <strong>题目保证</strong>：任意前缀或后缀的乘积都在 32 位整数范围内。<br>
+    <strong>要求</strong>：请 <strong>不要使用除法</strong>，且在 <strong>O(n)</strong> 时间复杂度内完成。<br><br>
+    <strong>进阶</strong>：你可以在 O(1) 的额外空间复杂度内完成这个题目吗？（出于学习目的，输出数组不被视为额外空间）
+    <div class="ex-box">
+      <p><span class="hl">示例 1：</span>nums = [1,2,3,4] → answer = [24,12,8,6]</p>
+      <p><span class="hl">示例 2：</span>nums = [-1,1,0,-3,3] → answer = [0,0,9,0,0]</p>
+    </div>
+  </div>
+</div>
+
+<!-- Ideas -->
+<div class="section">
+  <h2 style="color:#00c9ff">💡 核心思路 — 左右前缀积（两次遍历）</h2>
+  <div class="idea-grid">
+    <div class="idea-card">
+      <h3 style="color:#f7971e">① 左侧前缀积</h3>
+      <p>从左到右遍历，<code>answer[i]</code> 累乘 <code>nums[0..i-1]</code>，即当前元素 <strong>左边所有数的乘积</strong>。</p>
+    </div>
+    <div class="idea-card">
+      <h3 style="color:#00c9ff">② 右侧后缀积</h3>
+      <p>从右到左遍历，用变量 <code>R</code> 累乘 <code>nums[i+1..n-1]</code>，再与 <code>answer[i]</code> 相乘，叠加 <strong>右边所有数的乘积</strong>。</p>
+    </div>
+    <div class="idea-card">
+      <h3 style="color:#ff6b6b">③ 无除法 O(1) 空间</h3>
+      <p>答案数组 <code>answer</code> 既存左前缀积又被更新为最终结果，只需一个额外变量 <code>R</code>，空间 O(1)。</p>
+    </div>
+  </div>
+</div>
+
+<!-- Controls -->
+<div class="section">
+  <h2 style="color:#f7971e">🎮 交互控制</h2>
+  <div class="examples-row">
+    <button class="ex-btn" onclick="loadEx([1,2,3,4])">[1, 2, 3, 4]</button>
+    <button class="ex-btn" onclick="loadEx([-1,1,0,-3,3])">[-1, 1, 0, -3, 3]</button>
+    <button class="ex-btn" onclick="loadEx([2,3,4,5,6])">[2, 3, 4, 5, 6]</button>
+    <button class="ex-btn" onclick="loadEx([5,1,4,2])">[5, 1, 4, 2]</button>
+    <button class="ex-btn" onclick="loadEx([0,0])">[0, 0]</button>
+    <button class="ex-btn" onclick="loadEx([3,7])">[3, 7]</button>
+  </div>
+  <div class="ctrl-row">
+    <button class="btn btn-run" onclick="runAuto()">▶ 自动演示</button>
+    <button class="btn btn-step" onclick="stepForward()">⏭ 单步</button>
+    <button class="btn btn-reset" onclick="resetViz()">↺ 重置</button>
+    <div class="speed-ctrl">
+      <label>速度</label>
+      <input type="range" id="speedRange" min="1" max="10" value="5">
+    </div>
+  </div>
+</div>
+
+<!-- Code -->
+<div class="section">
+  <h2 style="color:#84fab0">💻 JavaScript 代码</h2>
+  <div class="code-block">
+    <div class="code-line" data-line="0"><span class="kw">var</span> <span class="fn">productExceptSelf</span> = <span class="kw">function</span>(<span class="vr">nums</span>) {</div>
+    <div class="code-line" data-line="1">  <span class="kw">const</span> <span class="vr">n</span> = <span class="vr">nums</span>.<span class="fn">length</span>;</div>
+    <div class="code-line" data-line="2">  <span class="kw">const</span> <span class="vr">answer</span> = <span class="kw">new</span> <span class="fn">Array</span>(<span class="vr">n</span>).<span class="fn">fill</span>(<span class="nm">1</span>);</div>
+    <div class="code-line" data-line="3"></div>
+    <div class="code-line" data-line="4">  <span class="cm">// Pass 1: left prefix product</span></div>
+    <div class="code-line" data-line="5">  <span class="kw">let</span> <span class="vr">leftProduct</span> = <span class="nm">1</span>;</div>
+    <div class="code-line" data-line="6">  <span class="kw">for</span> (<span class="kw">let</span> <span class="vr">i</span> = <span class="nm">1</span>; <span class="vr">i</span> <span class="op">&lt;</span> <span class="vr">n</span>; <span class="vr">i</span>++) {</div>
+    <div class="code-line" data-line="7">    <span class="vr">leftProduct</span> <span class="op">*=</span> <span class="vr">nums</span>[<span class="vr">i</span> - <span class="nm">1</span>];</div>
+    <div class="code-line" data-line="8">    <span class="vr">answer</span>[<span class="vr">i</span>] = <span class="vr">leftProduct</span>;</div>
+    <div class="code-line" data-line="9">  }</div>
+    <div class="code-line" data-line="10"></div>
+    <div class="code-line" data-line="11">  <span class="cm">// Pass 2: right suffix product</span></div>
+    <div class="code-line" data-line="12">  <span class="kw">let</span> <span class="vr">rightProduct</span> = <span class="nm">1</span>;</div>
+    <div class="code-line" data-line="13">  <span class="kw">for</span> (<span class="kw">let</span> <span class="vr">i</span> = <span class="vr">n</span> - <span class="nm">2</span>; <span class="vr">i</span> <span class="op">&gt;=</span> <span class="nm">0</span>; <span class="vr">i</span>--) {</div>
+    <div class="code-line" data-line="14">    <span class="vr">rightProduct</span> <span class="op">*=</span> <span class="vr">nums</span>[<span class="vr">i</span> + <span class="nm">1</span>];</div>
+    <div class="code-line" data-line="15">    <span class="vr">answer</span>[<span class="vr">i</span>] <span class="op">*=</span> <span class="vr">rightProduct</span>;</div>
+    <div class="code-line" data-line="16">  }</div>
+    <div class="code-line" data-line="17"></div>
+    <div class="code-line" data-line="18">  <span class="kw">return</span> <span class="vr">answer</span>;</div>
+    <div class="code-line" data-line="19">};</div>
+  </div>
+  <div class="complexity">
+    <span>时间复杂度：<strong>O(n)</strong> — 两次线性遍历</span>
+    <span>空间复杂度：<strong>O(1)</strong> — 除输出数组外只用了常数空间</span>
+  </div>
+</div>
+
+<!-- Visualization -->
+<div class="section">
+  <h2 style="color:#ff6b6b">🎨 动画图解</h2>
+
+  <div class="viz-stage-wrap">
+    <div class="viz-stage-label" id="stageLabel" style="background:rgba(247,151,30,.08);border:1.5px solid rgba(247,151,30,.3);color:#f7971e;">等待开始</div>
+  </div>
+
+  <!-- nums array -->
+  <div style="margin-bottom:4px">
+    <div class="arr-label">nums[]</div>
+    <div class="arr-row" id="numsRow"></div>
+  </div>
+
+  <!-- Pointer row -->
+  <div class="pointer-row" id="ptrRow"></div>
+
+  <!-- answer array -->
+  <div style="margin-bottom:4px">
+    <div class="arr-label">answer[]</div>
+    <div class="arr-row" id="ansRow"></div>
+  </div>
+
+  <!-- Formula panel -->
+  <div class="formula-panel" id="formulaPanel">
+    <span style="color:#5a6b80">公式将在这里显示</span>
+  </div>
+
+  <!-- Bar chart -->
+  <div style="margin-bottom:4px">
+    <div class="arr-label" style="text-align:center">answer[] 可视化柱状图</div>
+  </div>
+  <div class="bar-chart" id="barChart"></div>
+
+  <!-- Step info -->
+  <div class="step-info" id="stepInfo">点击 <span class="hl-o">自动演示</span> 或 <span class="hl-b">单步</span> 开始可视化。</div>
+
+  <!-- Result banner -->
+  <div class="result-banner" id="resultBanner">
+    <div class="r-label">✅ 最终结果 answer[]</div>
+    <div class="r-val" id="resultVal"></div>
+  </div>
+</div>
+
+<!-- Flowchart -->
+<div class="section">
+  <h2 style="color:#ffd200">📊 算法流程图</h2>
+  <div class="flowchart">
+    <div class="fl-node start" id="fl-start">开始：输入 nums[]</div>
+    <div class="fl-arrow"></div>
+    <div class="fl-node process" id="fl-init">初始化 answer[] 全为 1，leftProduct = 1</div>
+    <div class="fl-arrow"></div>
+    <div class="fl-node process" id="fl-left">→ 从左到右遍历（i = 1 → n-1）<br>answer[i] = leftProduct，leftProduct *= nums[i-1]</div>
+    <div class="fl-arrow"></div>
+    <div class="fl-node action" id="fl-left-done">左侧前缀积填充完毕</div>
+    <div class="fl-arrow"></div>
+    <div class="fl-node process" id="fl-right-init">初始化 rightProduct = 1</div>
+    <div class="fl-arrow"></div>
+    <div class="fl-node action" id="fl-right">← 从右到左遍历（i = n-2 → 0）<br>rightProduct *= nums[i+1]，answer[i] *= rightProduct</div>
+    <div class="fl-arrow"></div>
+    <div class="fl-node action" id="fl-right-done">右侧后缀积叠加完毕</div>
+    <div class="fl-arrow"></div>
+    <div class="fl-node end" id="fl-end">返回 answer[] 🎉</div>
+  </div>
+</div>
+
+</div>
+
+<script>
+// ===== State =====
+let steps = [];
+let curStep = -1;
+let autoTimer = null;
+let playing = false;
+let currentNums = [1,2,3,4];
+
+function loadEx(arr) {
+  currentNums = [...arr];
+  resetViz();
+}
+
+// ===== Generate Steps =====
+function genSteps(nums) {
+  const st = [];
+  const n = nums.length;
+  const answer = new Array(n).fill(1);
+
+  // Step 0: init
+  st.push({
+    type:'init', codeLine:2, flowId:'fl-init',
+    nums:[...nums], answer:[...answer],
+    ptr:-1, ptrType:'none', leftP:null, rightP:null,
+    formula:'',
+    info:`初始化 <span class="hl-w">answer = [${answer.join(', ')}]</span>，所有值为 1。`
+  });
+
+  // Step 1: leftProduct = 1
+  let leftProduct = 1;
+  st.push({
+    type:'left-init', codeLine:5, flowId:'fl-left',
+    nums:[...nums], answer:[...answer],
+    ptr:-1, ptrType:'none', leftP:1, rightP:null,
+    formula:'<span class="f-label">左前缀积</span> <span class="f-blue f-val">leftProduct = 1</span>',
+    info:`设置 <span class="hl-b">leftProduct = 1</span>，准备从左向右遍历，累积左侧乘积。`
+  });
+
+  // Pass 1: left prefix
+  for (let i = 1; i < n; i++) {
+    leftProduct *= nums[i - 1];
+    answer[i] = leftProduct;
+
+    st.push({
+      type:'left-step', codeLine:7, flowId:'fl-left',
+      nums:[...nums], answer:[...answer],
+      ptr:i, ptrType:'left', leftP:leftProduct, rightP:null,
+      highlightNums:i-1, highlightAns:i,
+      formula:`<span class="f-label">i=${i}</span> ` +
+        `<span class="f-blue f-val">leftProduct</span> *= <span class="f-orange">nums[${i-1}]=${nums[i-1]}</span> → ` +
+        `<span class="f-blue f-val">leftProduct = ${leftProduct}</span>` +
+        ` → <span class="f-green f-val">answer[${i}] = ${leftProduct}</span>`,
+      info:`<span class="hl-b">←左遍历 i=${i}</span>：leftProduct *= nums[${i-1}](<span class="hl-o">${nums[i-1]}</span>) = <span class="hl-b">${leftProduct}</span>，` +
+        `写入 answer[${i}] = <span class="hl-g">${leftProduct}</span>。`
+    });
+  }
+
+  // left done
+  st.push({
+    type:'left-done', codeLine:9, flowId:'fl-left-done',
+    nums:[...nums], answer:[...answer],
+    ptr:-1, ptrType:'none', leftP:leftProduct, rightP:null,
+    formula:`<span class="f-label">左遍历结束</span> <span class="f-blue f-val">answer = [${answer.join(', ')}]</span>`,
+    info:`✅ 第一趟结束！answer 中每个位置存储的是其 <span class="hl-b">左侧所有元素的乘积</span>：[${answer.join(', ')}]。`
+  });
+
+  // Step 2: rightProduct = 1
+  let rightProduct = 1;
+  st.push({
+    type:'right-init', codeLine:12, flowId:'fl-right-init',
+    nums:[...nums], answer:[...answer],
+    ptr:-1, ptrType:'none', leftP:leftProduct, rightP:1,
+    formula:'<span class="f-label">右后缀积</span> <span class="f-red f-val">rightProduct = 1</span>',
+    info:`设置 <span class="hl-r">rightProduct = 1</span>，准备从右向左遍历，叠加右侧乘积。`
+  });
+
+  // Pass 2: right suffix
+  for (let i = n - 2; i >= 0; i--) {
+    rightProduct *= nums[i + 1];
+    const oldAns = answer[i];
+    answer[i] *= rightProduct;
+
+    st.push({
+      type:'right-step', codeLine:14, flowId:'fl-right',
+      nums:[...nums], answer:[...answer],
+      ptr:i, ptrType:'right', leftP:leftProduct, rightP:rightProduct,
+      highlightNums:i+1, highlightAns:i, oldAns:oldAns,
+      formula:`<span class="f-label">i=${i}</span> ` +
+        `<span class="f-red f-val">rightProduct</span> *= <span class="f-orange">nums[${i+1}]=${nums[i+1]}</span> → ` +
+        `<span class="f-red f-val">rightProduct = ${rightProduct}</span>` +
+        ` → <span class="f-green f-val">answer[${i}] = ${oldAns} × ${rightProduct} = ${answer[i]}</span>`,
+      info:`<span class="hl-r">→右遍历 i=${i}</span>：rightProduct *= nums[${i+1}](<span class="hl-o">${nums[i+1]}</span>) = <span class="hl-r">${rightProduct}</span>，` +
+        `answer[${i}] = <span class="hl-b">${oldAns}</span> × <span class="hl-r">${rightProduct}</span> = <span class="hl-g">${answer[i]}</span>。`
+    });
+  }
+
+  // right done
+  st.push({
+    type:'right-done', codeLine:16, flowId:'fl-right-done',
+    nums:[...nums], answer:[...answer],
+    ptr:-1, ptrType:'none', leftP:leftProduct, rightP:rightProduct,
+    formula:`<span class="f-label">右遍历结束</span> <span class="f-green f-val">answer = [${answer.join(', ')}]</span>`,
+    info:`✅ 第二趟结束！每个 answer[i] = <span class="hl-b">左侧乘积</span> × <span class="hl-r">右侧乘积</span> = <span class="hl-g">除自身外的乘积</span>。`
+  });
+
+  // done
+  st.push({
+    type:'done', codeLine:18, flowId:'fl-end',
+    nums:[...nums], answer:[...answer],
+    ptr:-1, ptrType:'none', leftP:leftProduct, rightP:rightProduct,
+    formula:`<span class="f-label">✅ 完成</span> <span class="f-green f-val">[${answer.join(', ')}]</span>`,
+    info:`🎉 完成！nums = [${nums.join(', ')}] → answer = <span class="hl-g">[${answer.join(', ')}]</span>。`
+  });
+
+  return st;
+}
+
+// ===== Render =====
+function renderArrayRow(containerId, arr, highlightIdx, cellClass) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = '';
+  arr.forEach((v, i) => {
+    const cell = document.createElement('div');
+    let cls = 'cell';
+    if (i === highlightIdx) cls += ' hl-current hl-multiply';
+    else if (cellClass) cls += ' ' + cellClass;
+    cell.className = cls;
+    cell.innerHTML = `<div class="c-idx">${i}</div><div class="c-box">${v}</div>`;
+    el.appendChild(cell);
+  });
+}
+
+function renderPointers(idx, type) {
+  const el = document.getElementById('ptrRow');
+  if (idx < 0 || type === 'none') { el.innerHTML = ''; return; }
+  const n = currentNums.length;
+  el.innerHTML = '';
+  for (let i = 0; i < n; i++) {
+    const ptr = document.createElement('span');
+    ptr.style.minWidth = '52px';
+    ptr.style.textAlign = 'center';
+    ptr.style.display = 'inline-block';
+    if (i === idx) {
+      ptr.className = type === 'left' ? 'ptr ptr-i show' : 'ptr ptr-j show';
+      ptr.textContent = type === 'left' ? '▲ i' : '▲ i';
+    } else {
+      ptr.className = 'ptr';
+      ptr.innerHTML = '&nbsp;';
+    }
+    el.appendChild(ptr);
+  }
+}
+
+function renderBarChart(answer) {
+  const el = document.getElementById('barChart');
+  el.innerHTML = '';
+  const absMax = Math.max(...answer.map(Math.abs), 1);
+  answer.forEach((v, i) => {
+    const col = document.createElement('div');
+    col.className = 'bar-col';
+
+    const val = document.createElement('div');
+    val.className = 'bar-val';
+    val.textContent = v;
+
+    const bar = document.createElement('div');
+    bar.className = 'bar';
+    const h = Math.max(4, Math.abs(v) / absMax * 130);
+    bar.style.height = h + 'px';
+    if (v > 0) bar.style.background = 'linear-gradient(180deg,rgba(132,250,176,.7),rgba(132,250,176,.2))';
+    else if (v < 0) bar.style.background = 'linear-gradient(180deg,rgba(255,107,107,.7),rgba(255,107,107,.2))';
+    else bar.style.background = 'rgba(255,255,255,.08)';
+
+    const idx = document.createElement('div');
+    idx.className = 'bar-idx';
+    idx.textContent = i;
+
+    col.appendChild(val);
+    col.appendChild(bar);
+    col.appendChild(idx);
+    el.appendChild(col);
+  });
+}
+
+function renderStep(idx) {
+  if (idx < 0 || idx >= steps.length) return;
+  const s = steps[idx];
+
+  // Code highlight
+  document.querySelectorAll('.code-line').forEach(el => el.classList.remove('active'));
+  const cl = document.querySelector(`.code-line[data-line="${s.codeLine}"]`);
+  if (cl) cl.classList.add('active');
+
+  // Flow highlight
+  document.querySelectorAll('.fl-node').forEach(el => el.classList.remove('active-fl'));
+  const fn = document.getElementById(s.flowId);
+  if (fn) fn.classList.add('active-fl');
+
+  // Stage label
+  const label = document.getElementById('stageLabel');
+  const resultBanner = document.getElementById('resultBanner');
+  resultBanner.style.display = 'none';
+
+  switch (s.type) {
+    case 'init':
+      label.textContent = '📦 初始化 answer[]';
+      label.style.borderColor = 'rgba(255,210,0,.4)'; label.style.color = '#ffd200';
+      break;
+    case 'left-init': case 'left-step':
+      label.textContent = '→ 第一趟：左侧前缀积';
+      label.style.borderColor = 'rgba(0,201,255,.4)'; label.style.color = '#00c9ff';
+      break;
+    case 'left-done':
+      label.textContent = '✅ 左侧前缀积完成';
+      label.style.borderColor = 'rgba(0,201,255,.4)'; label.style.color = '#00c9ff';
+      break;
+    case 'right-init': case 'right-step':
+      label.textContent = '← 第二趟：右侧后缀积';
+      label.style.borderColor = 'rgba(255,107,107,.4)'; label.style.color = '#ff6b6b';
+      break;
+    case 'right-done':
+      label.textContent = '✅ 右侧后缀积完成';
+      label.style.borderColor = 'rgba(255,107,107,.4)'; label.style.color = '#ff6b6b';
+      break;
+    case 'done':
+      label.textContent = '🎉 算法完成';
+      label.style.borderColor = 'rgba(132,250,176,.5)'; label.style.color = '#84fab0';
+      resultBanner.style.display = 'block';
+      document.getElementById('resultVal').textContent = `[${s.answer.join(', ')}]`;
+      break;
+  }
+
+  // nums row
+  const numsHL = (s.highlightNums != null) ? s.highlightNums : -1;
+  renderArrayRow('numsRow', s.nums, numsHL, 'hl-src');
+
+  // answer row
+  const ansHL = (s.highlightAns != null) ? s.highlightAns : -1;
+  const ansCls = s.type.startsWith('left') ? 'hl-left' : s.type.startsWith('right') ? 'hl-right' : (s.type === 'done' ? 'hl-result' : '');
+  renderArrayRow('ansRow', s.answer, ansHL, ansCls);
+
+  // Pointers
+  renderPointers(s.ptr, s.ptrType);
+
+  // Formula
+  document.getElementById('formulaPanel').innerHTML = s.formula || '';
+
+  // Bar chart
+  renderBarChart(s.answer);
+
+  // Step info
+  document.getElementById('stepInfo').innerHTML = `<strong>步骤 ${idx + 1}/${steps.length}：</strong>${s.info}`;
+}
+
+// ===== Controls =====
+function initViz() {
+  steps = genSteps(currentNums);
+  curStep = -1;
+  const n = currentNums.length;
+  const init = new Array(n).fill(1);
+
+  renderArrayRow('numsRow', currentNums, -1, 'hl-src');
+  renderArrayRow('ansRow', init, -1, '');
+  document.getElementById('ptrRow').innerHTML = '';
+  renderBarChart(init);
+  document.getElementById('formulaPanel').innerHTML = '<span style="color:#5a6b80">公式将在这里显示</span>';
+  document.getElementById('resultBanner').style.display = 'none';
+
+  const label = document.getElementById('stageLabel');
+  label.textContent = '等待开始';
+  label.style.borderColor = 'rgba(247,151,30,.3)'; label.style.color = '#f7971e';
+
+  document.getElementById('stepInfo').innerHTML = `点击 <span class="hl-o">自动演示</span> 或 <span class="hl-b">单步</span> 开始。nums = <span class="hl-w">[${currentNums.join(', ')}]</span>`;
+  document.querySelectorAll('.code-line').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.fl-node').forEach(el => el.classList.remove('active-fl'));
+}
+
+function stepForward() {
+  if (curStep === -1 && steps.length === 0) initViz();
+  if (curStep < steps.length - 1) { curStep++; renderStep(curStep); }
+}
+
+function getDelay() { return 1900 - document.getElementById('speedRange').value * 160; }
+
+function runAuto() {
+  if (playing) { clearTimeout(autoTimer); playing = false; document.querySelector('.btn-run').textContent = '▶ 自动演示'; return; }
+  if (curStep === -1 || curStep >= steps.length - 1) initViz();
+  playing = true;
+  document.querySelector('.btn-run').textContent = '⏸ 暂停';
+  (function tick() {
+    if (curStep < steps.length - 1) { curStep++; renderStep(curStep); autoTimer = setTimeout(tick, getDelay()); }
+    else { playing = false; document.querySelector('.btn-run').textContent = '▶ 自动演示'; }
+  })();
+}
+
+function resetViz() {
+  clearTimeout(autoTimer); playing = false;
+  document.querySelector('.btn-run').textContent = '▶ 自动演示';
+  initViz();
+}
+
+window.addEventListener('DOMContentLoaded', initViz);
+</script>
+</body>
+</html>

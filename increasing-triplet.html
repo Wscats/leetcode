@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>递增的三元子序列 - 交互式图解</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;background:linear-gradient(135deg,#0a0e1a 0%,#111b2e 50%,#0b1320 100%);min-height:100vh;color:#e0e0e0;padding:28px 18px}
+.container{max-width:1100px;margin:0 auto}
+h1{text-align:center;font-size:2rem;margin-bottom:4px;background:linear-gradient(90deg,#00c9ff,#92fe9d,#00c9ff,#ffd200);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.subtitle{text-align:center;color:#6d7f94;font-size:.9rem;margin-bottom:30px}
+
+.section{background:rgba(255,255,255,.028);border:1px solid rgba(255,255,255,.055);border-radius:16px;padding:24px 26px;margin-bottom:20px;backdrop-filter:blur(4px)}
+.section h2{font-size:1.1rem;margin-bottom:15px;display:flex;align-items:center;gap:8px}
+
+.problem{line-height:2;font-size:.92rem;color:#bcc6d2}
+.problem strong{color:#ffd200}
+.problem code{background:rgba(255,210,0,.08);padding:2px 7px;border-radius:5px;color:#ffd200;font-size:.83rem;font-family:'Fira Code',Consolas,monospace}
+.ex-box{background:rgba(255,255,255,.02);border-left:3px solid #00c9ff;border-radius:0 10px 10px 0;padding:13px 17px;margin-top:12px;margin-bottom:8px}
+.ex-box p{font-size:.84rem;line-height:1.9;color:#a0acb8;font-family:'Fira Code',Consolas,monospace}
+.ex-box .hl{color:#00c9ff;font-weight:600}
+.ex-box .hl-g{color:#84fab0;font-weight:600}
+.ex-box .hl-r{color:#ff6b6b;font-weight:600}
+
+.idea-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:13px}
+.idea-card{background:rgba(255,255,255,.018);border-radius:12px;padding:18px;border-left:3px solid;transition:transform .22s}
+.idea-card:hover{transform:translateY(-3px)}
+.idea-card:nth-child(1){border-color:#00c9ff}
+.idea-card:nth-child(2){border-color:#ffd200}
+.idea-card:nth-child(3){border-color:#84fab0}
+.idea-card h3{font-size:.92rem;margin-bottom:8px}
+.idea-card p{font-size:.8rem;color:#96a3b1;line-height:1.75}
+.idea-card code{background:rgba(255,255,255,.06);padding:1px 5px;border-radius:3px;font-size:.76rem;font-family:'Fira Code',Consolas,monospace}
+
+.examples-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:13px}
+.ex-btn{padding:7px 15px;border:1.5px solid rgba(255,255,255,.08);border-radius:8px;background:rgba(255,255,255,.022);color:#90a0b2;font-size:.82rem;cursor:pointer;transition:all .2s;font-family:'Fira Code',Consolas,monospace}
+.ex-btn:hover{border-color:#00c9ff;color:#00c9ff;background:rgba(0,201,255,.06)}
+.ctrl-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:center}
+.btn{padding:10px 22px;border:none;border-radius:10px;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .22s;white-space:nowrap}
+.btn:hover{transform:translateY(-2px)}
+.btn-run{background:linear-gradient(135deg,#00c9ff,#92fe9d);color:#0a1628}
+.btn-run:hover{box-shadow:0 6px 20px rgba(0,201,255,.35)}
+.btn-step{background:linear-gradient(135deg,#ffd200,#f7971e);color:#0a1628}
+.btn-step:hover{box-shadow:0 6px 20px rgba(255,210,0,.35)}
+.btn-reset{background:rgba(255,255,255,.06);color:#7a8d9f}
+.btn-reset:hover{background:rgba(255,255,255,.1);color:#bbb}
+.speed-ctrl{display:flex;align-items:center;gap:6px}
+.speed-ctrl label{font-size:.76rem;color:#7a8d9f}
+.speed-ctrl input[type=range]{width:86px;accent-color:#00c9ff}
+
+/* Code */
+.code-block{font-family:'Fira Code',Consolas,monospace;font-size:.82rem;line-height:1.88;overflow-x:auto}
+.code-line{padding:2px 12px;border-radius:4px;transition:background .35s,border-color .35s;white-space:pre;border-left:3px solid transparent}
+.code-line.active{background:rgba(0,201,255,.12);border-left-color:#00c9ff}
+.kw{color:#c678dd}.fn{color:#61afef}.cm{color:#5c6370;font-style:italic}.vr{color:#e5c07b}.op{color:#56b6c2}.st{color:#98c379}.nm{color:#d19a66}
+.complexity{margin-top:16px;padding:13px 16px;background:rgba(255,255,255,.02);border-radius:10px;display:flex;gap:36px;flex-wrap:wrap}
+.complexity span{font-size:.84rem;color:#96a3b1}
+.complexity strong{color:#00c9ff}
+
+/* Viz */
+.viz-stage-wrap{text-align:center;margin-bottom:14px}
+.viz-stage-label{text-align:center;font-size:.92rem;font-weight:700;margin-bottom:14px;padding:10px 20px;border-radius:10px;display:inline-block}
+
+.arr-row{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin:10px 0;min-height:50px;align-items:flex-end}
+.arr-label{font-size:.75rem;font-weight:700;color:#5a6b80;width:100%;text-align:left;padding-left:8px;margin-bottom:2px;letter-spacing:.5px}
+.cell{display:flex;flex-direction:column;align-items:center;gap:3px;transition:all .4s}
+.cell .c-idx{font-size:.58rem;color:#3a4a5a;font-family:'Fira Code',Consolas,monospace}
+.cell .c-box{min-width:52px;height:46px;display:flex;align-items:center;justify-content:center;border:1.5px solid rgba(255,255,255,.08);border-radius:8px;font-size:1.05rem;font-family:'Fira Code',Consolas,monospace;font-weight:700;padding:0 8px;transition:all .4s;background:rgba(255,255,255,.015)}
+.cell .c-tag{font-size:.55rem;font-weight:700;padding:1px 6px;border-radius:4px;min-height:16px;transition:all .3s}
+
+/* Colors */
+.cell.hl-scan .c-box{border-color:rgba(255,210,0,.5);background:rgba(255,210,0,.08);color:#ffd200;box-shadow:0 0 12px rgba(255,210,0,.2)}
+.cell.hl-first .c-box{border-color:rgba(0,201,255,.6);background:rgba(0,201,255,.1);color:#00c9ff}
+.cell.hl-second .c-box{border-color:rgba(255,107,107,.6);background:rgba(255,107,107,.1);color:#ff6b6b}
+.cell.hl-third .c-box{border-color:rgba(132,250,176,.6);background:rgba(132,250,176,.1);color:#84fab0}
+.cell.hl-passed .c-box{border-color:rgba(255,255,255,.04);color:#3a4a5a}
+.cell.hl-found .c-box{animation:foundPulse .6s ease-in-out}
+
+@keyframes foundPulse{0%{transform:scale(1)}40%{transform:scale(1.18);box-shadow:0 0 22px rgba(132,250,176,.5)}100%{transform:scale(1)}}
+@keyframes scanBounce{0%{transform:translateY(0)}50%{transform:translateY(-4px)}100%{transform:translateY(0)}}
+
+.pointer-row{display:flex;justify-content:center;gap:6px;min-height:26px;align-items:center;margin:4px 0}
+.ptr{font-size:.7rem;font-weight:800;padding:2px 8px;border-radius:5px;transition:all .4s;opacity:0;font-family:'Fira Code',Consolas,monospace;min-width:52px;text-align:center}
+.ptr.show{opacity:1}
+
+/* Variable state panel */
+.var-panel{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:14px 0}
+.var-box{padding:14px 18px;border-radius:12px;background:rgba(255,255,255,.02);border:1.5px solid rgba(255,255,255,.05);transition:all .4s}
+.var-box.active{border-color:rgba(255,210,0,.4);box-shadow:0 0 14px rgba(255,210,0,.1)}
+.var-box .v-label{font-size:.7rem;color:#5a6b80;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.var-box .v-val{font-size:1.35rem;font-weight:800;font-family:'Fira Code',Consolas,monospace;transition:all .3s}
+.v-blue{color:#00c9ff}.v-red{color:#ff6b6b}.v-green{color:#84fab0}.v-yellow{color:#ffd200}.v-gray{color:#3a4a5a}
+
+/* Compare formula */
+.formula-panel{padding:16px 22px;background:rgba(255,255,255,.025);border-radius:12px;margin:14px 0;text-align:center;font-family:'Fira Code',Consolas,monospace;font-size:.92rem;min-height:54px;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;line-height:1.8;transition:all .3s}
+.f-label{font-size:.72rem;font-weight:700;color:#5a6b80;padding:3px 10px;border-radius:6px;background:rgba(255,255,255,.03)}
+.f-val{font-weight:700}
+.f-orange{color:#f7971e}.f-blue{color:#00c9ff}.f-red{color:#ff6b6b}.f-green{color:#84fab0}.f-white{color:#fff}.f-yellow{color:#ffd200}
+
+/* Bar chart */
+.bar-chart{display:flex;justify-content:center;align-items:flex-end;gap:8px;height:140px;padding:0 16px;margin:18px 0}
+.bar-col{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;max-width:62px}
+.bar{width:100%;border-radius:6px 6px 0 0;transition:height .5s ease,background .4s;min-height:2px}
+.bar-val{font-size:.72rem;font-family:'Fira Code',Consolas,monospace;font-weight:700;color:#fff;transition:all .3s}
+.bar-idx{font-size:.7rem;color:#5a6b80;font-family:'Fira Code',Consolas,monospace}
+
+.step-info{padding:14px 20px;background:rgba(255,255,255,.028);border-radius:10px;font-size:.88rem;color:#bcc6d0;line-height:1.85;min-height:50px;margin-top:14px}
+.hl-o{color:#f7971e;font-weight:600}.hl-b{color:#00c9ff;font-weight:600}.hl-r{color:#ff6b6b;font-weight:600}.hl-g{color:#84fab0;font-weight:600}.hl-w{color:#fff;font-weight:700}.hl-y{color:#ffd200;font-weight:600}
+
+.result-banner{margin-top:16px;padding:22px 26px;border-radius:14px;text-align:center;display:none}
+.result-banner.found{background:rgba(132,250,176,.07);border:2px solid rgba(132,250,176,.25)}
+.result-banner.not-found{background:rgba(255,107,107,.07);border:2px solid rgba(255,107,107,.25)}
+.result-banner .r-label{font-size:.82rem;color:#7a8d9f;margin-bottom:6px}
+.result-banner .r-val{font-size:1.45rem;font-weight:800;font-family:'Fira Code',Consolas,monospace;letter-spacing:2px}
+.result-banner .r-detail{font-size:.82rem;color:#7a8d9f;margin-top:8px}
+
+/* Flowchart */
+.flowchart{display:flex;flex-direction:column;align-items:center;gap:0}
+.fl-node{padding:12px 24px;border-radius:12px;font-size:.83rem;font-weight:600;text-align:center;max-width:480px;transition:all .35s}
+.fl-node.start{background:linear-gradient(135deg,#667eea,#764ba2);border-radius:28px}
+.fl-node.process{background:rgba(0,201,255,.06);border:2px solid rgba(0,201,255,.18)}
+.fl-node.decision{background:rgba(255,210,0,.04);border:2px solid rgba(255,210,0,.18);border-radius:4px;transform:rotate(0deg);position:relative}
+.fl-node.action{background:rgba(255,107,107,.05);border:2px solid rgba(255,107,107,.18)}
+.fl-node.end-t{background:linear-gradient(135deg,#11998e,#38ef7d);border-radius:28px;color:#000}
+.fl-node.end-f{background:linear-gradient(135deg,#e44d26,#ff6b6b);border-radius:28px;color:#fff}
+.fl-node.active-fl{box-shadow:0 0 22px rgba(255,210,0,.4);border-color:#ffd200 !important}
+.fl-arrow{width:2px;height:16px;background:rgba(255,255,255,.08);position:relative}
+.fl-arrow::after{content:'▼';position:absolute;bottom:-9px;left:50%;transform:translateX(-50%);font-size:.5rem;color:rgba(255,255,255,.15)}
+.fl-row{display:flex;gap:16px;align-items:center}
+.fl-h-arrow{height:2px;width:24px;background:rgba(255,255,255,.08);position:relative}
+.fl-h-arrow::after{content:'▶';position:absolute;right:-6px;top:50%;transform:translateY(-50%);font-size:.5rem;color:rgba(255,255,255,.15)}
+.fl-side-label{font-size:.68rem;color:#5a6b80;font-weight:700;position:absolute;top:-14px;left:50%;transform:translateX(-50%)}
+
+/* Triplet highlight */
+.triplet-display{display:flex;justify-content:center;gap:12px;margin:12px 0;align-items:center}
+.tri-item{padding:10px 18px;border-radius:10px;font-family:'Fira Code',Consolas,monospace;font-size:1.1rem;font-weight:800;border:2px solid}
+.tri-first{background:rgba(0,201,255,.08);border-color:rgba(0,201,255,.4);color:#00c9ff}
+.tri-second{background:rgba(255,107,107,.08);border-color:rgba(255,107,107,.4);color:#ff6b6b}
+.tri-third{background:rgba(132,250,176,.08);border-color:rgba(132,250,176,.4);color:#84fab0}
+.tri-sep{color:#3a4a5a;font-size:1.2rem;font-weight:800}
+
+/* Legend */
+.legend{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin:12px 0;padding:10px;background:rgba(255,255,255,.015);border-radius:10px}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:.74rem;color:#7a8d9f}
+.legend-dot{width:12px;height:12px;border-radius:3px}
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>📈 递增的三元子序列</h1>
+<p class="subtitle">LeetCode 334 · Increasing Triplet Subsequence</p>
+
+<!-- Problem -->
+<div class="section">
+  <h2 style="color:#ffd200">📋 题目描述</h2>
+  <div class="problem">
+    给你一个整数数组 <code>nums</code>，判断这个数组中是否存在长度为 <strong>3</strong> 的递增子序列。<br><br>
+    即是否存在下标 <code>i</code>、<code>j</code>、<code>k</code>，满足 <code>i &lt; j &lt; k</code> 且 <code>nums[i] &lt; nums[j] &lt; nums[k]</code>。<br>
+    如果存在，返回 <code>true</code>；否则返回 <code>false</code>。<br><br>
+    <strong>进阶</strong>：你能实现时间复杂度为 <strong>O(n)</strong>、空间复杂度为 <strong>O(1)</strong> 的解决方案吗？
+    <div class="ex-box">
+      <p><span class="hl">示例 1：</span>nums = [1,2,3,4,5] → <span class="hl-g">true</span> &nbsp; 三元组 (1,2,3)</p>
+      <p><span class="hl">示例 2：</span>nums = [5,4,3,2,1] → <span class="hl-r">false</span> &nbsp; 不存在递增三元组</p>
+      <p><span class="hl">示例 3：</span>nums = [2,1,5,0,4,6] → <span class="hl-g">true</span> &nbsp; 三元组 (0,4,6)</p>
+    </div>
+  </div>
+</div>
+
+<!-- Ideas -->
+<div class="section">
+  <h2 style="color:#00c9ff">💡 核心思路 — 贪心双哨兵</h2>
+  <div class="idea-grid">
+    <div class="idea-card">
+      <h3 style="color:#00c9ff">① 维护 first 最小值</h3>
+      <p>变量 <code>first</code> 始终存储遍历过程中遇到的 <strong>最小值</strong>。当 <code>nums[i] ≤ first</code> 时更新它，让后续更容易找到递增序列。</p>
+    </div>
+    <div class="idea-card">
+      <h3 style="color:#ffd200">② 维护 second 次小值</h3>
+      <p>变量 <code>second</code> 存储 <strong>大于 first 的最小值</strong>。当 <code>nums[i] ≤ second</code> 时更新它。此时已找到长度为 2 的递增序列。</p>
+    </div>
+    <div class="idea-card">
+      <h3 style="color:#84fab0">③ 发现第三个即成功</h3>
+      <p>一旦遇到 <code>nums[i] &gt; second</code>，说明找到了 <strong>first &lt; second &lt; nums[i]</strong>，三元递增子序列存在，返回 <code>true</code>！</p>
+    </div>
+  </div>
+</div>
+
+<!-- Controls -->
+<div class="section">
+  <h2 style="color:#f7971e">🎮 交互控制</h2>
+  <div class="examples-row">
+    <button class="ex-btn" onclick="loadEx([1,2,3,4,5])">[1,2,3,4,5]</button>
+    <button class="ex-btn" onclick="loadEx([5,4,3,2,1])">[5,4,3,2,1]</button>
+    <button class="ex-btn" onclick="loadEx([2,1,5,0,4,6])">[2,1,5,0,4,6]</button>
+    <button class="ex-btn" onclick="loadEx([20,100,10,12,5,13])">[20,100,10,12,5,13]</button>
+    <button class="ex-btn" onclick="loadEx([1,1,1,1])">[1,1,1,1]</button>
+    <button class="ex-btn" onclick="loadEx([1,5,0,4,1,3])">[1,5,0,4,1,3]</button>
+  </div>
+  <div class="ctrl-row">
+    <button class="btn btn-run" id="btnRun" onclick="runAuto()">▶ 自动演示</button>
+    <button class="btn btn-step" onclick="stepForward()">⏭ 单步</button>
+    <button class="btn btn-reset" onclick="resetViz()">↺ 重置</button>
+    <div class="speed-ctrl">
+      <label>速度</label>
+      <input type="range" id="speedRange" min="1" max="10" value="5">
+    </div>
+  </div>
+</div>
+
+<!-- Code -->
+<div class="section">
+  <h2 style="color:#84fab0">💻 JavaScript 代码</h2>
+  <div class="code-block">
+    <div class="code-line" data-line="0"><span class="kw">var</span> <span class="fn">increasingTriplet</span> = <span class="kw">function</span>(<span class="vr">nums</span>) {</div>
+    <div class="code-line" data-line="1">  <span class="kw">let</span> <span class="vr">first</span>  = <span class="nm">Infinity</span>;  <span class="cm">// the smallest so far</span></div>
+    <div class="code-line" data-line="2">  <span class="kw">let</span> <span class="vr">second</span> = <span class="nm">Infinity</span>;  <span class="cm">// second smallest (> first)</span></div>
+    <div class="code-line" data-line="3"></div>
+    <div class="code-line" data-line="4">  <span class="kw">for</span> (<span class="kw">const</span> <span class="vr">num</span> <span class="kw">of</span> <span class="vr">nums</span>) {</div>
+    <div class="code-line" data-line="5">    <span class="kw">if</span> (<span class="vr">num</span> <span class="op">&lt;=</span> <span class="vr">first</span>) {</div>
+    <div class="code-line" data-line="6">      <span class="vr">first</span> = <span class="vr">num</span>;            <span class="cm">// update smallest</span></div>
+    <div class="code-line" data-line="7">    } <span class="kw">else if</span> (<span class="vr">num</span> <span class="op">&lt;=</span> <span class="vr">second</span>) {</div>
+    <div class="code-line" data-line="8">      <span class="vr">second</span> = <span class="vr">num</span>;           <span class="cm">// update second smallest</span></div>
+    <div class="code-line" data-line="9">    } <span class="kw">else</span> {</div>
+    <div class="code-line" data-line="10">      <span class="kw">return</span> <span class="nm">true</span>;           <span class="cm">// found triplet!</span></div>
+    <div class="code-line" data-line="11">    }</div>
+    <div class="code-line" data-line="12">  }</div>
+    <div class="code-line" data-line="13"></div>
+    <div class="code-line" data-line="14">  <span class="kw">return</span> <span class="nm">false</span>;</div>
+    <div class="code-line" data-line="15">};</div>
+  </div>
+  <div class="complexity">
+    <span>时间复杂度：<strong>O(n)</strong> — 一次遍历</span>
+    <span>空间复杂度：<strong>O(1)</strong> — 只用两个变量</span>
+  </div>
+</div>
+
+<!-- Visualization -->
+<div class="section">
+  <h2 style="color:#ff6b6b">🎨 动画图解</h2>
+
+  <div class="viz-stage-wrap">
+    <div class="viz-stage-label" id="stageLabel" style="background:rgba(0,201,255,.08);border:1.5px solid rgba(0,201,255,.3);color:#00c9ff;">等待开始</div>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:rgba(255,210,0,.6)"></div>当前扫描 num</div>
+    <div class="legend-item"><div class="legend-dot" style="background:rgba(0,201,255,.6)"></div>first（最小值）</div>
+    <div class="legend-item"><div class="legend-dot" style="background:rgba(255,107,107,.6)"></div>second（次小值）</div>
+    <div class="legend-item"><div class="legend-dot" style="background:rgba(132,250,176,.6)"></div>第三个（找到！）</div>
+    <div class="legend-item"><div class="legend-dot" style="background:rgba(255,255,255,.06)"></div>已扫描</div>
+  </div>
+
+  <!-- nums array -->
+  <div style="margin-bottom:4px">
+    <div class="arr-label">nums[]</div>
+    <div class="arr-row" id="numsRow"></div>
+  </div>
+
+  <!-- Pointer row -->
+  <div class="pointer-row" id="ptrRow"></div>
+
+  <!-- Variable state panel -->
+  <div class="var-panel">
+    <div class="var-box" id="varFirst">
+      <div class="v-label">first（最小值）</div>
+      <div class="v-val v-blue" id="valFirst">∞</div>
+    </div>
+    <div class="var-box" id="varSecond">
+      <div class="v-label">second（次小值）</div>
+      <div class="v-val v-red" id="valSecond">∞</div>
+    </div>
+    <div class="var-box" id="varCurrent">
+      <div class="v-label">当前 num</div>
+      <div class="v-val v-yellow" id="valCurrent">—</div>
+    </div>
+    <div class="var-box" id="varAction">
+      <div class="v-label">判断 & 操作</div>
+      <div class="v-val v-green" id="valAction" style="font-size:.88rem">—</div>
+    </div>
+  </div>
+
+  <!-- Formula panel -->
+  <div class="formula-panel" id="formulaPanel">
+    <span style="color:#5a6b80">比较过程将在这里显示</span>
+  </div>
+
+  <!-- Bar chart -->
+  <div style="margin-bottom:4px">
+    <div class="arr-label" style="text-align:center">数组值柱状图（标注 first / second 基线）</div>
+  </div>
+  <div class="bar-chart" id="barChart"></div>
+
+  <!-- Step info -->
+  <div class="step-info" id="stepInfo">点击 <span class="hl-b">自动演示</span> 或 <span class="hl-y">单步</span> 开始可视化。</div>
+
+  <!-- Result banner -->
+  <div class="result-banner" id="resultBanner">
+    <div class="r-label" id="rLabel"></div>
+    <div class="r-val" id="resultVal"></div>
+    <div class="triplet-display" id="tripletDisplay" style="display:none"></div>
+    <div class="r-detail" id="rDetail"></div>
+  </div>
+</div>
+
+<!-- Flowchart -->
+<div class="section">
+  <h2 style="color:#ffd200">📊 算法流程图</h2>
+  <div class="flowchart">
+    <div class="fl-node start" id="fl-start">开始：输入 nums[]</div>
+    <div class="fl-arrow"></div>
+    <div class="fl-node process" id="fl-init">初始化 first = ∞，second = ∞</div>
+    <div class="fl-arrow"></div>
+    <div class="fl-node process" id="fl-loop">遍历数组：取出 num = nums[i]</div>
+    <div class="fl-arrow"></div>
+    <div class="fl-node decision" id="fl-check1">num ≤ first？</div>
+    <div class="fl-arrow"></div>
+    <div class="fl-node action" id="fl-update1">✅ 是 → first = num（更新最小值）</div>
+    <div class="fl-arrow"></div>
+    <div class="fl-node decision" id="fl-check2">num ≤ second？</div>
+    <div class="fl-arrow"></div>
+    <div class="fl-node action" id="fl-update2">✅ 是 → second = num（更新次小值）</div>
+    <div class="fl-arrow"></div>
+    <div class="fl-node end-t" id="fl-found">num > second → 找到三元组！return true 🎉</div>
+    <div class="fl-arrow"></div>
+    <div class="fl-node process" id="fl-next">继续下一个元素...</div>
+    <div class="fl-arrow"></div>
+    <div class="fl-node end-f" id="fl-notfound">遍历结束仍未找到 → return false ✗</div>
+  </div>
+</div>
+
+</div>
+
+<script>
+let steps = [];
+let curStep = -1;
+let autoTimer = null;
+let playing = false;
+let currentNums = [1,2,3,4,5];
+
+function loadEx(arr) {
+  currentNums = [...arr];
+  resetViz();
+}
+
+function fmtVal(v) {
+  return v === Infinity ? '∞' : v;
+}
+
+// ===== Generate Steps =====
+function genSteps(nums) {
+  const st = [];
+  const n = nums.length;
+  let first = Infinity, second = Infinity;
+  let foundResult = false;
+  let foundIdx = -1;
+
+  // Step 0: init
+  st.push({
+    type: 'init', codeLine: 1, flowId: 'fl-init',
+    scanIdx: -1, first: Infinity, second: Infinity, num: null,
+    action: '初始化',
+    formula: '<span class="f-label">初始化</span> <span class="f-blue f-val">first = ∞</span>，<span class="f-red f-val">second = ∞</span>',
+    info: '初始化两个哨兵变量：<span class="hl-b">first = ∞</span>（记录最小值），<span class="hl-r">second = ∞</span>（记录次小值）。',
+    cellStates: new Array(n).fill('none'),
+    firstIdx: -1, secondIdx: -1
+  });
+
+  let firstIdx = -1, secondIdx = -1;
+
+  for (let i = 0; i < n; i++) {
+    const num = nums[i];
+    const cellStates = new Array(n).fill('none');
+    // mark passed
+    for (let p = 0; p < i; p++) cellStates[p] = 'passed';
+    cellStates[i] = 'scan';
+
+    // mark first/second positions
+    if (firstIdx >= 0 && firstIdx < i) cellStates[firstIdx] = 'first';
+    if (secondIdx >= 0 && secondIdx < i) cellStates[secondIdx] = 'second';
+
+    if (num <= first) {
+      const oldFirst = first;
+      first = num;
+      firstIdx = i;
+      cellStates[i] = 'first'; // this becomes new first
+
+      st.push({
+        type: 'update-first', codeLine: 6, flowId: 'fl-update1',
+        scanIdx: i, first, second, num,
+        action: `first = ${num}`,
+        formula: `<span class="f-label">i=${i}</span> ` +
+          `<span class="f-yellow f-val">num=${num}</span> ≤ <span class="f-blue">first=${fmtVal(oldFirst)}</span>` +
+          ` → <span class="f-blue f-val">first = ${num}</span>（更新最小值）`,
+        info: `<span class="hl-y">num = ${num}</span> ≤ <span class="hl-b">first = ${fmtVal(oldFirst)}</span>，` +
+          `更新 <span class="hl-b">first = ${num}</span>，保持最小值尽可能小。`,
+        cellStates: [...cellStates],
+        firstIdx: i, secondIdx
+      });
+    } else if (num <= second) {
+      const oldSecond = second;
+      second = num;
+      secondIdx = i;
+      cellStates[i] = 'second';
+
+      st.push({
+        type: 'update-second', codeLine: 8, flowId: 'fl-update2',
+        scanIdx: i, first, second, num,
+        action: `second = ${num}`,
+        formula: `<span class="f-label">i=${i}</span> ` +
+          `<span class="f-yellow f-val">num=${num}</span> > <span class="f-blue">first=${first}</span>` +
+          ` 且 ≤ <span class="f-red">second=${fmtVal(oldSecond)}</span>` +
+          ` → <span class="f-red f-val">second = ${num}</span>（更新次小值）`,
+        info: `<span class="hl-y">num = ${num}</span> > <span class="hl-b">first = ${first}</span>，` +
+          `且 ≤ <span class="hl-r">second = ${fmtVal(oldSecond)}</span>，` +
+          `更新 <span class="hl-r">second = ${num}</span>，找到更优的两元递增序列。`,
+        cellStates: [...cellStates],
+        firstIdx, secondIdx: i
+      });
+    } else {
+      // found!
+      cellStates[i] = 'third';
+      if (firstIdx >= 0) cellStates[firstIdx] = 'first';
+      if (secondIdx >= 0) cellStates[secondIdx] = 'second';
+
+      foundResult = true;
+      foundIdx = i;
+
+      st.push({
+        type: 'found', codeLine: 10, flowId: 'fl-found',
+        scanIdx: i, first, second, num,
+        action: `🎉 找到！`,
+        formula: `<span class="f-label">i=${i}</span> ` +
+          `<span class="f-yellow f-val">num=${num}</span> > <span class="f-red">second=${second}</span>` +
+          ` → 🎉 <span class="f-green f-val">找到三元组 ${first} < ${second} < ${num}</span>`,
+        info: `🎉 <span class="hl-y">num = ${num}</span> > <span class="hl-r">second = ${second}</span>！` +
+          `找到递增三元组：<span class="hl-b">${first}</span> < <span class="hl-r">${second}</span> < <span class="hl-g">${num}</span>，返回 <span class="hl-g">true</span>！`,
+        cellStates: [...cellStates],
+        firstIdx, secondIdx,
+        triplet: [first, second, num]
+      });
+      break;
+    }
+  }
+
+  if (!foundResult) {
+    st.push({
+      type: 'not-found', codeLine: 14, flowId: 'fl-notfound',
+      scanIdx: -1, first, second, num: null,
+      action: '未找到',
+      formula: `<span class="f-label">遍历结束</span> <span class="f-red f-val">未找到递增三元子序列 → return false</span>`,
+      info: `遍历完整个数组，未找到满足条件的递增三元组，返回 <span class="hl-r">false</span>。`,
+      cellStates: new Array(nums.length).fill('passed'),
+      firstIdx, secondIdx
+    });
+  }
+
+  return st;
+}
+
+// ===== Render =====
+function renderArrayRow(nums, step) {
+  const el = document.getElementById('numsRow');
+  el.innerHTML = '';
+  nums.forEach((v, i) => {
+    const cell = document.createElement('div');
+    let cls = 'cell';
+    const state = step ? step.cellStates[i] : 'none';
+    if (state === 'scan') cls += ' hl-scan';
+    else if (state === 'first') cls += ' hl-first';
+    else if (state === 'second') cls += ' hl-second';
+    else if (state === 'third') cls += ' hl-third hl-found';
+    else if (state === 'passed') cls += ' hl-passed';
+    cell.className = cls;
+
+    let tag = '';
+    if (state === 'scan') tag = '<div class="c-tag" style="background:rgba(255,210,0,.15);color:#ffd200">扫描</div>';
+    else if (state === 'first') tag = '<div class="c-tag" style="background:rgba(0,201,255,.15);color:#00c9ff">first</div>';
+    else if (state === 'second') tag = '<div class="c-tag" style="background:rgba(255,107,107,.15);color:#ff6b6b">second</div>';
+    else if (state === 'third') tag = '<div class="c-tag" style="background:rgba(132,250,176,.15);color:#84fab0">third!</div>';
+    else tag = '<div class="c-tag">&nbsp;</div>';
+
+    cell.innerHTML = `<div class="c-idx">${i}</div><div class="c-box">${v}</div>${tag}`;
+    el.appendChild(cell);
+  });
+}
+
+function renderPointers(idx) {
+  const el = document.getElementById('ptrRow');
+  el.innerHTML = '';
+  const n = currentNums.length;
+  for (let i = 0; i < n; i++) {
+    const ptr = document.createElement('span');
+    ptr.style.minWidth = '52px';
+    ptr.style.textAlign = 'center';
+    ptr.style.display = 'inline-block';
+    if (i === idx) {
+      ptr.className = 'ptr show';
+      ptr.style.background = 'rgba(255,210,0,.12)';
+      ptr.style.color = '#ffd200';
+      ptr.style.border = '1px solid rgba(255,210,0,.3)';
+      ptr.textContent = '▲ i=' + i;
+    } else {
+      ptr.className = 'ptr';
+      ptr.innerHTML = '&nbsp;';
+    }
+    el.appendChild(ptr);
+  }
+}
+
+function renderBarChart(nums, step) {
+  const el = document.getElementById('barChart');
+  el.innerHTML = '';
+  const vals = nums.map(Math.abs);
+  const maxVal = Math.max(...vals, 1);
+
+  nums.forEach((v, i) => {
+    const col = document.createElement('div');
+    col.className = 'bar-col';
+
+    const val = document.createElement('div');
+    val.className = 'bar-val';
+    val.textContent = v;
+
+    const bar = document.createElement('div');
+    bar.className = 'bar';
+    const h = Math.max(4, Math.abs(v) / maxVal * 110);
+    bar.style.height = h + 'px';
+
+    const state = step ? step.cellStates[i] : 'none';
+    if (state === 'scan') bar.style.background = 'linear-gradient(180deg,rgba(255,210,0,.7),rgba(255,210,0,.2))';
+    else if (state === 'first') bar.style.background = 'linear-gradient(180deg,rgba(0,201,255,.7),rgba(0,201,255,.2))';
+    else if (state === 'second') bar.style.background = 'linear-gradient(180deg,rgba(255,107,107,.7),rgba(255,107,107,.2))';
+    else if (state === 'third') bar.style.background = 'linear-gradient(180deg,rgba(132,250,176,.8),rgba(132,250,176,.2))';
+    else if (state === 'passed') bar.style.background = 'rgba(255,255,255,.04)';
+    else bar.style.background = 'rgba(255,255,255,.08)';
+
+    const idx = document.createElement('div');
+    idx.className = 'bar-idx';
+    idx.textContent = i;
+
+    col.appendChild(val);
+    col.appendChild(bar);
+    col.appendChild(idx);
+    el.appendChild(col);
+  });
+}
+
+function renderStep(idx) {
+  if (idx < 0 || idx >= steps.length) return;
+  const s = steps[idx];
+
+  // Code highlight
+  document.querySelectorAll('.code-line').forEach(el => el.classList.remove('active'));
+  const cl = document.querySelector(`.code-line[data-line="${s.codeLine}"]`);
+  if (cl) cl.classList.add('active');
+
+  // Flow highlight
+  document.querySelectorAll('.fl-node').forEach(el => el.classList.remove('active-fl'));
+  const fn = document.getElementById(s.flowId);
+  if (fn) fn.classList.add('active-fl');
+
+  // Stage label
+  const label = document.getElementById('stageLabel');
+  const resultBanner = document.getElementById('resultBanner');
+  resultBanner.style.display = 'none';
+
+  switch (s.type) {
+    case 'init':
+      label.textContent = '📦 初始化 first & second';
+      label.style.borderColor = 'rgba(0,201,255,.4)'; label.style.color = '#00c9ff';
+      break;
+    case 'update-first':
+      label.textContent = `🔵 更新 first = ${s.first}`;
+      label.style.borderColor = 'rgba(0,201,255,.4)'; label.style.color = '#00c9ff';
+      break;
+    case 'update-second':
+      label.textContent = `🔴 更新 second = ${s.second}`;
+      label.style.borderColor = 'rgba(255,107,107,.4)'; label.style.color = '#ff6b6b';
+      break;
+    case 'found':
+      label.textContent = '🎉 找到递增三元组！return true';
+      label.style.borderColor = 'rgba(132,250,176,.5)'; label.style.color = '#84fab0';
+      resultBanner.style.display = 'block';
+      resultBanner.className = 'result-banner found';
+      document.getElementById('rLabel').textContent = '✅ 结果';
+      document.getElementById('resultVal').textContent = 'true';
+      document.getElementById('resultVal').style.color = '#84fab0';
+      const td = document.getElementById('tripletDisplay');
+      td.style.display = 'flex';
+      td.innerHTML = `<div class="tri-item tri-first">${s.triplet[0]}</div>` +
+        `<div class="tri-sep"><</div>` +
+        `<div class="tri-item tri-second">${s.triplet[1]}</div>` +
+        `<div class="tri-sep"><</div>` +
+        `<div class="tri-item tri-third">${s.triplet[2]}</div>`;
+      document.getElementById('rDetail').textContent = `找到递增三元组：${s.triplet[0]} < ${s.triplet[1]} < ${s.triplet[2]}`;
+      break;
+    case 'not-found':
+      label.textContent = '✗ 未找到递增三元组 → return false';
+      label.style.borderColor = 'rgba(255,107,107,.4)'; label.style.color = '#ff6b6b';
+      resultBanner.style.display = 'block';
+      resultBanner.className = 'result-banner not-found';
+      document.getElementById('rLabel').textContent = '✗ 结果';
+      document.getElementById('resultVal').textContent = 'false';
+      document.getElementById('resultVal').style.color = '#ff6b6b';
+      document.getElementById('tripletDisplay').style.display = 'none';
+      document.getElementById('rDetail').textContent = '遍历结束，不存在递增的三元子序列。';
+      break;
+  }
+
+  // Array row
+  renderArrayRow(currentNums, s);
+
+  // Pointers
+  renderPointers(s.scanIdx);
+
+  // Variables
+  document.getElementById('valFirst').textContent = fmtVal(s.first);
+  document.getElementById('valSecond').textContent = fmtVal(s.second);
+  document.getElementById('valCurrent').textContent = s.num !== null ? s.num : '—';
+  document.getElementById('valAction').textContent = s.action;
+
+  // Highlight active var box
+  document.querySelectorAll('.var-box').forEach(el => el.classList.remove('active'));
+  if (s.type === 'update-first') document.getElementById('varFirst').classList.add('active');
+  else if (s.type === 'update-second') document.getElementById('varSecond').classList.add('active');
+  else if (s.type === 'found') document.getElementById('varAction').classList.add('active');
+
+  // Formula
+  document.getElementById('formulaPanel').innerHTML = s.formula || '';
+
+  // Bar chart
+  renderBarChart(currentNums, s);
+
+  // Step info
+  document.getElementById('stepInfo').innerHTML = `<strong>步骤 ${idx + 1}/${steps.length}：</strong>${s.info}`;
+}
+
+// ===== Controls =====
+function initViz() {
+  steps = genSteps(currentNums);
+  curStep = -1;
+
+  renderArrayRow(currentNums, null);
+  document.getElementById('ptrRow').innerHTML = '';
+  renderBarChart(currentNums, null);
+  document.getElementById('formulaPanel').innerHTML = '<span style="color:#5a6b80">比较过程将在这里显示</span>';
+  document.getElementById('resultBanner').style.display = 'none';
+
+  document.getElementById('valFirst').textContent = '∞';
+  document.getElementById('valSecond').textContent = '∞';
+  document.getElementById('valCurrent').textContent = '—';
+  document.getElementById('valAction').textContent = '—';
+  document.querySelectorAll('.var-box').forEach(el => el.classList.remove('active'));
+
+  const label = document.getElementById('stageLabel');
+  label.textContent = '等待开始';
+  label.style.borderColor = 'rgba(0,201,255,.3)'; label.style.color = '#00c9ff';
+
+  document.getElementById('stepInfo').innerHTML = `点击 <span class="hl-b">自动演示</span> 或 <span class="hl-y">单步</span> 开始。nums = <span class="hl-w">[${currentNums.join(', ')}]</span>`;
+  document.querySelectorAll('.code-line').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.fl-node').forEach(el => el.classList.remove('active-fl'));
+}
+
+function stepForward() {
+  if (curStep === -1 && steps.length === 0) initViz();
+  if (curStep < steps.length - 1) { curStep++; renderStep(curStep); }
+}
+
+function getDelay() { return 1900 - document.getElementById('speedRange').value * 160; }
+
+function runAuto() {
+  if (playing) {
+    clearTimeout(autoTimer); playing = false;
+    document.getElementById('btnRun').textContent = '▶ 自动演示'; return;
+  }
+  if (curStep === -1 || curStep >= steps.length - 1) initViz();
+  playing = true;
+  document.getElementById('btnRun').textContent = '⏸ 暂停';
+  (function tick() {
+    if (curStep < steps.length - 1) {
+      curStep++; renderStep(curStep);
+      autoTimer = setTimeout(tick, getDelay());
+    } else {
+      playing = false;
+      document.getElementById('btnRun').textContent = '▶ 自动演示';
+    }
+  })();
+}
+
+function resetViz() {
+  clearTimeout(autoTimer); playing = false;
+  document.getElementById('btnRun').textContent = '▶ 自动演示';
+  initViz();
+}
+
+window.addEventListener('DOMContentLoaded', initViz);
+</script>
+</body>
+</html>

@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>种花问题 - 交互式图解</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: linear-gradient(135deg, #0a1628, #1a2744, #0d1f2d);
+      min-height: 100vh;
+      color: #fff;
+      padding: 30px 20px;
+    }
+
+    .container { max-width: 1020px; margin: 0 auto; }
+
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 6px;
+      background: linear-gradient(90deg, #ff6b8a, #ffd93d, #6bcb77, #4fc3f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #889;
+      margin-bottom: 28px;
+      font-size: 0.92rem;
+    }
+
+    /* ===== Section Card ===== */
+    .section {
+      background: rgba(255,255,255,0.04);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 22px;
+      border: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .section h2 {
+      font-size: 1.12rem;
+      margin-bottom: 16px;
+    }
+
+    /* ===== Problem ===== */
+    .problem { line-height: 1.9; font-size: 0.92rem; color: #ccc; }
+    .problem strong { color: #ffd93d; }
+    .problem code {
+      background: rgba(255,217,61,0.1);
+      padding: 2px 7px;
+      border-radius: 4px;
+      color: #ffd93d;
+      font-size: 0.86rem;
+    }
+
+    /* ===== Idea Cards ===== */
+    .idea-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 14px;
+    }
+
+    .idea-card {
+      background: rgba(255,255,255,0.03);
+      border-radius: 12px;
+      padding: 16px;
+      border-left: 3px solid;
+    }
+
+    .idea-card:nth-child(1) { border-color: #ff6b8a; }
+    .idea-card:nth-child(2) { border-color: #ffd93d; }
+    .idea-card:nth-child(3) { border-color: #6bcb77; }
+    .idea-card:nth-child(4) { border-color: #4fc3f7; }
+
+    .idea-card h3 { font-size: 0.92rem; margin-bottom: 8px; }
+    .idea-card p { font-size: 0.82rem; color: #bbb; line-height: 1.65; }
+    .idea-card code {
+      background: rgba(255,255,255,0.08);
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 0.8rem;
+    }
+
+    /* ===== Input ===== */
+    .input-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+
+    .input-group { display: flex; flex-direction: column; gap: 4px; }
+    .input-group label { font-size: 0.78rem; color: #999; font-weight: 600; }
+
+    .input-group input {
+      padding: 9px 14px;
+      border: 2px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+      font-size: 1rem;
+      outline: none;
+      font-family: 'Fira Code', Consolas, monospace;
+      transition: border-color 0.3s;
+    }
+
+    .input-group input:focus { border-color: #6bcb77; }
+    .input-group input.wide { width: 280px; }
+    .input-group input.short { width: 90px; }
+
+    .btn {
+      padding: 9px 22px;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+
+    .btn:hover { transform: translateY(-2px); }
+
+    .btn-run { background: linear-gradient(135deg, #6bcb77, #38ef7d); color: #000; }
+    .btn-run:hover { box-shadow: 0 6px 18px rgba(107,203,119,0.4); }
+
+    .btn-step { background: linear-gradient(135deg, #4fc3f7, #0288d1); color: #000; }
+    .btn-step:hover { box-shadow: 0 6px 18px rgba(79,195,247,0.4); }
+
+    .btn-reset { background: rgba(255,255,255,0.08); color: #aaa; }
+    .btn-reset:hover { background: rgba(255,255,255,0.14); }
+
+    .speed-ctrl { display: flex; align-items: center; gap: 6px; }
+    .speed-ctrl label { font-size: 0.78rem; color: #999; }
+    .speed-ctrl input[type="range"] { width: 90px; accent-color: #6bcb77; }
+
+    /* ===== Examples ===== */
+    .examples { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 14px; }
+
+    .ex-btn {
+      padding: 6px 14px;
+      border: 1.5px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      background: rgba(255,255,255,0.04);
+      color: #bbb;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .ex-btn:hover { border-color: #6bcb77; color: #6bcb77; background: rgba(107,203,119,0.06); }
+
+    /* ===== Code Block ===== */
+    .code-block {
+      font-family: 'Fira Code', Consolas, monospace;
+      font-size: 0.84rem;
+      line-height: 1.8;
+      overflow-x: auto;
+    }
+
+    .code-line {
+      padding: 2px 10px;
+      border-radius: 4px;
+      transition: background 0.3s;
+      white-space: pre;
+      border-left: 3px solid transparent;
+    }
+
+    .code-line.active {
+      background: rgba(107,203,119,0.14);
+      border-left-color: #6bcb77;
+    }
+
+    .kw { color: #c678dd; }
+    .fn { color: #61afef; }
+    .cm { color: #5c6370; font-style: italic; }
+    .vr { color: #e5c07b; }
+    .op { color: #56b6c2; }
+    .nm { color: #d19a66; }
+    .st { color: #98c379; }
+
+    .complexity {
+      margin-top: 18px;
+      padding: 14px 18px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 10px;
+      display: flex;
+      gap: 30px;
+      flex-wrap: wrap;
+    }
+
+    .complexity span { font-size: 0.86rem; color: #bbb; }
+    .complexity strong { color: #6bcb77; }
+
+    /* ===== Flowerbed Visualization ===== */
+    .flowerbed-wrap {
+      display: flex;
+      gap: 0;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+    }
+
+    .plot {
+      width: 72px;
+      height: 90px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      margin: 4px;
+      transition: all 0.4s;
+      position: relative;
+      background: rgba(255,255,255,0.02);
+    }
+
+    .plot .idx {
+      position: absolute;
+      top: 4px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 0.65rem;
+      color: #556;
+    }
+
+    .plot .emoji {
+      font-size: 1.8rem;
+      transition: all 0.3s;
+      display: block;
+      height: 36px;
+      line-height: 36px;
+    }
+
+    .plot .val {
+      font-size: 0.82rem;
+      font-weight: 700;
+      font-family: 'Fira Code', Consolas, monospace;
+      margin-top: 4px;
+      transition: all 0.3s;
+    }
+
+    .plot.empty .emoji::after { content: ''; }
+    .plot.empty .val { color: #556; }
+
+    .plot.flower .emoji::after { content: ''; }
+    .plot.flower .val { color: #6bcb77; }
+    .plot.flower {
+      background: rgba(107,203,119,0.06);
+      border-color: rgba(107,203,119,0.25);
+    }
+
+    .plot.checking {
+      border-color: #ffd93d;
+      box-shadow: 0 0 18px rgba(255,217,61,0.35);
+      transform: translateY(-4px);
+      background: rgba(255,217,61,0.06);
+    }
+
+    .plot.just-planted {
+      border-color: #6bcb77;
+      box-shadow: 0 0 22px rgba(107,203,119,0.5);
+      transform: translateY(-4px);
+      background: rgba(107,203,119,0.12);
+    }
+
+    .plot.just-planted .emoji { transform: scale(1.25); }
+
+    .plot.skip {
+      border-color: rgba(255,107,107,0.35);
+      background: rgba(255,107,107,0.05);
+    }
+
+    .plot .planted-badge {
+      position: absolute;
+      bottom: -10px;
+      background: linear-gradient(135deg, #6bcb77, #38ef7d);
+      color: #000;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 8px;
+      opacity: 0;
+      transform: scale(0);
+      transition: all 0.3s;
+    }
+
+    .plot .planted-badge.show {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* Neighbor check indicators */
+    .neighbor-check {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+      min-height: 36px;
+    }
+
+    .nb-item {
+      padding: 5px 14px;
+      border-radius: 8px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      font-family: 'Fira Code', Consolas, monospace;
+      transition: all 0.3s;
+    }
+
+    .nb-ok {
+      background: rgba(107,203,119,0.12);
+      color: #6bcb77;
+      border: 1px solid rgba(107,203,119,0.3);
+    }
+
+    .nb-bad {
+      background: rgba(255,107,107,0.1);
+      color: #ff6b8a;
+      border: 1px solid rgba(255,107,107,0.25);
+    }
+
+    /* Counter */
+    .counter-row {
+      display: flex;
+      gap: 28px;
+      justify-content: center;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .counter-box {
+      padding: 12px 22px;
+      border-radius: 12px;
+      text-align: center;
+      min-width: 130px;
+    }
+
+    .counter-box.planted-box {
+      background: rgba(107,203,119,0.1);
+      border: 1.5px solid rgba(107,203,119,0.3);
+    }
+
+    .counter-box.need-box {
+      background: rgba(255,107,107,0.08);
+      border: 1.5px solid rgba(255,107,107,0.25);
+    }
+
+    .counter-box .counter-label {
+      font-size: 0.78rem;
+      color: #999;
+      margin-bottom: 4px;
+    }
+
+    .counter-box .counter-val {
+      font-size: 1.6rem;
+      font-weight: 800;
+      font-family: 'Fira Code', Consolas, monospace;
+    }
+
+    .counter-box.planted-box .counter-val { color: #6bcb77; }
+    .counter-box.need-box .counter-val { color: #ff6b8a; }
+
+    /* Step Info */
+    .step-info {
+      padding: 14px 18px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 10px;
+      font-size: 0.9rem;
+      color: #ddd;
+      line-height: 1.75;
+      min-height: 50px;
+    }
+
+    .hl-r { color: #ff6b8a; font-weight: 600; }
+    .hl-y { color: #ffd93d; font-weight: 600; }
+    .hl-g { color: #6bcb77; font-weight: 600; }
+    .hl-b { color: #4fc3f7; font-weight: 600; }
+
+    /* Result banner */
+    .result-banner {
+      margin-top: 16px;
+      padding: 16px 24px;
+      border-radius: 12px;
+      text-align: center;
+      font-size: 1.1rem;
+      font-weight: 700;
+      display: none;
+    }
+
+    .result-banner.pass {
+      display: block;
+      background: rgba(107,203,119,0.12);
+      border: 2px solid rgba(107,203,119,0.35);
+      color: #6bcb77;
+    }
+
+    .result-banner.fail {
+      display: block;
+      background: rgba(255,107,107,0.1);
+      border: 2px solid rgba(255,107,107,0.3);
+      color: #ff6b8a;
+    }
+
+    /* ===== Flowchart ===== */
+    .flowchart {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    .fl-node {
+      padding: 11px 22px;
+      border-radius: 12px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      text-align: center;
+      max-width: 420px;
+      transition: all 0.3s;
+    }
+
+    .fl-node.start {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 28px;
+    }
+
+    .fl-node.process {
+      background: rgba(79,172,254,0.1);
+      border: 2px solid rgba(79,172,254,0.25);
+    }
+
+    .fl-node.decision {
+      background: rgba(255,217,61,0.08);
+      border: 2px solid rgba(255,217,61,0.25);
+    }
+
+    .fl-node.end-yes {
+      background: linear-gradient(135deg, #11998e, #38ef7d);
+      border-radius: 28px;
+      color: #000;
+    }
+
+    .fl-node.end-no {
+      background: linear-gradient(135deg, #ff6b8a, #ee5a24);
+      border-radius: 28px;
+    }
+
+    .fl-node.active-fl {
+      box-shadow: 0 0 20px rgba(255,217,61,0.45);
+      border-color: #ffd93d !important;
+    }
+
+    .fl-arrow {
+      width: 2px;
+      height: 20px;
+      background: rgba(255,255,255,0.15);
+      position: relative;
+    }
+
+    .fl-arrow::after {
+      content: '▼';
+      position: absolute;
+      bottom: -9px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.55rem;
+      color: rgba(255,255,255,0.25);
+    }
+
+    .fl-branch {
+      display: flex;
+      gap: 50px;
+      justify-content: center;
+      margin-top: 4px;
+    }
+
+    .fl-branch-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .fl-branch-label {
+      font-size: 0.75rem;
+      color: #999;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .fl-loop-back {
+      margin-top: 6px;
+      font-size: 0.75rem;
+      color: #889;
+    }
+
+    @keyframes plantPop {
+      0% { transform: scale(0.2); opacity: 0; }
+      50% { transform: scale(1.3); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .plot.just-planted .emoji {
+      animation: plantPop 0.45s ease-out;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🌸 种花问题</h1>
+    <p class="subtitle">LeetCode 605 · Can Place Flowers</p>
+
+    <!-- Problem -->
+    <div class="section">
+      <h2 style="color:#ff6b8a;">📋 题目描述</h2>
+      <div class="problem">
+        假设有一个很长的花坛，一部分地块种植了花，另一部分没有。花 <strong>不能种植在相邻的地块上</strong>，它们会争夺水源。<br><br>
+        给你一个整数数组 <code>flowerbed</code>，由 <strong>0</strong>（空地）和 <strong>1</strong>（有花）组成，以及一个整数 <code>n</code>。<br>
+        能否在不打破种植规则的情况下种入 <code>n</code> 朵花？能则返回 <code>true</code>，不能则返回 <code>false</code>。<br><br>
+        <strong>提示：</strong><code>1 ≤ flowerbed.length ≤ 2×10⁴</code>，<code>flowerbed[i]</code> 为 0 或 1，数组中不存在相邻的两朵花。
+      </div>
+    </div>
+
+    <!-- Core Idea -->
+    <div class="section">
+      <h2 style="color:#ffd93d;">💡 核心思路 — 贪心算法</h2>
+      <div class="idea-grid">
+        <div class="idea-card">
+          <h3 style="color:#ff6b8a;">① 贪心策略</h3>
+          <p>从左到右扫描，遇到能种花的位置就 <strong>立即种下</strong>。尽早种花不会让后续结果更差。</p>
+        </div>
+        <div class="idea-card">
+          <h3 style="color:#ffd93d;">② 三条件判断</h3>
+          <p>位置 <code>i</code> 能种花需同时满足：<br>
+            • <code>bed[i] == 0</code><br>
+            • 左邻居为 0 或不存在<br>
+            • 右邻居为 0 或不存在</p>
+        </div>
+        <div class="idea-card">
+          <h3 style="color:#6bcb77;">③ 种下并标记</h3>
+          <p>种花后将 <code>bed[i]</code> 设为 <code>1</code>，计数器 <code>count++</code>。这样后续检查自动跳过相邻位。</p>
+        </div>
+        <div class="idea-card">
+          <h3 style="color:#4fc3f7;">④ 提前退出</h3>
+          <p>当 <code>count ≥ n</code> 时可立即返回 <code>true</code>，无需继续遍历，提升效率。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Examples & Input -->
+    <div class="section">
+      <h2 style="color:#4fc3f7;">🎮 交互控制</h2>
+      <div class="examples">
+        <button class="ex-btn" onclick="loadEx([1,0,0,0,1], 1)">示例1: [1,0,0,0,1], n=1</button>
+        <button class="ex-btn" onclick="loadEx([1,0,0,0,1], 2)">示例2: [1,0,0,0,1], n=2</button>
+        <button class="ex-btn" onclick="loadEx([0,0,1,0,0,0,0,1,0,0], 3)">示例3: 较长花坛, n=3</button>
+        <button class="ex-btn" onclick="loadEx([0,0,0,0,0], 3)">全空: [0,0,0,0,0], n=3</button>
+        <button class="ex-btn" onclick="loadEx([1,0,1,0,1], 1)">满花: [1,0,1,0,1], n=1</button>
+      </div>
+      <div class="input-row">
+        <div class="input-group">
+          <label>flowerbed（逗号分隔 0/1）</label>
+          <input type="text" id="bedInput" class="wide" value="1,0,0,0,1" placeholder="如 1,0,0,0,1">
+        </div>
+        <div class="input-group">
+          <label>n</label>
+          <input type="text" id="nInput" class="short" value="1" placeholder="如 1">
+        </div>
+        <button class="btn btn-run" onclick="runAuto()">▶ 自动演示</button>
+        <button class="btn btn-step" onclick="stepForward()">⏭ 单步</button>
+        <button class="btn btn-reset" onclick="resetViz()">↺ 重置</button>
+        <div class="speed-ctrl">
+          <label>速度</label>
+          <input type="range" id="speedRange" min="1" max="10" value="5">
+        </div>
+      </div>
+    </div>
+
+    <!-- Code -->
+    <div class="section">
+      <h2 style="color:#6bcb77;">💻 JavaScript 代码</h2>
+      <div class="code-block">
+        <div class="code-line" data-line="0"><span class="kw">function</span> <span class="fn">canPlaceFlowers</span>(<span class="vr">flowerbed</span>, <span class="vr">n</span>) {</div>
+        <div class="code-line" data-line="1">  <span class="kw">let</span> <span class="vr">count</span> = <span class="nm">0</span>;</div>
+        <div class="code-line" data-line="2">  <span class="kw">for</span> (<span class="kw">let</span> <span class="vr">i</span> = <span class="nm">0</span>; <span class="vr">i</span> &lt; <span class="vr">flowerbed</span>.<span class="vr">length</span>; <span class="vr">i</span>++) {</div>
+        <div class="code-line" data-line="3">    <span class="kw">if</span> (<span class="vr">flowerbed</span>[<span class="vr">i</span>] === <span class="nm">0</span>) {</div>
+        <div class="code-line" data-line="4">      <span class="kw">const</span> <span class="vr">leftOk</span>  = <span class="vr">i</span> === <span class="nm">0</span> || <span class="vr">flowerbed</span>[<span class="vr">i</span> - <span class="nm">1</span>] === <span class="nm">0</span>;</div>
+        <div class="code-line" data-line="5">      <span class="kw">const</span> <span class="vr">rightOk</span> = <span class="vr">i</span> === <span class="vr">flowerbed</span>.<span class="vr">length</span> - <span class="nm">1</span> || <span class="vr">flowerbed</span>[<span class="vr">i</span> + <span class="nm">1</span>] === <span class="nm">0</span>;</div>
+        <div class="code-line" data-line="6">      <span class="kw">if</span> (<span class="vr">leftOk</span> &amp;&amp; <span class="vr">rightOk</span>) {</div>
+        <div class="code-line" data-line="7">        <span class="vr">flowerbed</span>[<span class="vr">i</span>] = <span class="nm">1</span>; <span class="cm">// plant here</span></div>
+        <div class="code-line" data-line="8">        <span class="vr">count</span>++;</div>
+        <div class="code-line" data-line="9">        <span class="kw">if</span> (<span class="vr">count</span> >= <span class="vr">n</span>) <span class="kw">return</span> <span class="nm">true</span>;</div>
+        <div class="code-line" data-line="10">      }</div>
+        <div class="code-line" data-line="11">    }</div>
+        <div class="code-line" data-line="12">  }</div>
+        <div class="code-line" data-line="13">  <span class="kw">return</span> <span class="vr">count</span> >= <span class="vr">n</span>;</div>
+        <div class="code-line" data-line="14">}</div>
+      </div>
+      <div class="complexity">
+        <span>时间复杂度：<strong>O(n)</strong> — 单次遍历花坛</span>
+        <span>空间复杂度：<strong>O(1)</strong> — 原地修改</span>
+      </div>
+    </div>
+
+    <!-- Visualization -->
+    <div class="section">
+      <h2 style="color:#ff6b8a;">🎨 动画图解</h2>
+
+      <!-- Counters -->
+      <div class="counter-row">
+        <div class="counter-box planted-box">
+          <div class="counter-label">已种花数 count</div>
+          <div class="counter-val" id="plantedCount">0</div>
+        </div>
+        <div class="counter-box need-box">
+          <div class="counter-label">还需种 n</div>
+          <div class="counter-val" id="needCount">0</div>
+        </div>
+      </div>
+
+      <!-- Flowerbed -->
+      <div class="flowerbed-wrap" id="flowerbed"></div>
+
+      <!-- Neighbor check -->
+      <div class="neighbor-check" id="neighborCheck"></div>
+
+      <!-- Step info -->
+      <div class="step-info" id="stepInfo">
+        点击 <span class="hl-g">自动演示</span> 或 <span class="hl-b">单步</span> 开始可视化。
+      </div>
+
+      <!-- Result banner -->
+      <div class="result-banner" id="resultBanner"></div>
+    </div>
+
+    <!-- Flowchart -->
+    <div class="section">
+      <h2 style="color:#ffd93d;">📊 算法流程图</h2>
+      <div class="flowchart">
+        <div class="fl-node start" id="fl-start">开始：输入 flowerbed, n</div>
+        <div class="fl-arrow"></div>
+        <div class="fl-node process" id="fl-init">初始化 count = 0，i = 0</div>
+        <div class="fl-arrow"></div>
+        <div class="fl-node decision" id="fl-loop">i &lt; flowerbed.length ?</div>
+        <div class="fl-arrow"></div>
+        <div class="fl-node decision" id="fl-empty">flowerbed[i] === 0 ?</div>
+        <div class="fl-arrow"></div>
+        <div class="fl-node decision" id="fl-neighbors">左邻居==0 且 右邻居==0 ?</div>
+        <div class="fl-arrow"></div>
+        <div class="fl-branch">
+          <div class="fl-branch-col">
+            <div class="fl-branch-label">✅ 可以种</div>
+            <div class="fl-node process" style="border-color:rgba(107,203,119,0.4);background:rgba(107,203,119,0.08);" id="fl-plant">种花! bed[i]=1, count++</div>
+            <div class="fl-arrow"></div>
+            <div class="fl-node decision" id="fl-enough">count ≥ n ?</div>
+            <div class="fl-arrow"></div>
+            <div class="fl-branch">
+              <div class="fl-branch-col">
+                <div class="fl-branch-label">✅ 够了</div>
+                <div class="fl-node end-yes" id="fl-true">返回 true 🎉</div>
+              </div>
+              <div class="fl-branch-col">
+                <div class="fl-branch-label">❌ 继续</div>
+                <div class="fl-node process" id="fl-next1" style="font-size:0.8rem;">i++, 继续循环</div>
+              </div>
+            </div>
+          </div>
+          <div class="fl-branch-col">
+            <div class="fl-branch-label">❌ 不能种</div>
+            <div class="fl-node process" style="border-color:rgba(255,107,107,0.3);background:rgba(255,107,107,0.06);" id="fl-skip">跳过，i++</div>
+          </div>
+        </div>
+        <div class="fl-arrow"></div>
+        <div class="fl-node decision" id="fl-final">循环结束：count ≥ n ?</div>
+        <div class="fl-arrow"></div>
+        <div class="fl-branch">
+          <div class="fl-branch-col">
+            <div class="fl-branch-label">✅ 是</div>
+            <div class="fl-node end-yes" id="fl-true2">返回 true</div>
+          </div>
+          <div class="fl-branch-col">
+            <div class="fl-branch-label">❌ 否</div>
+            <div class="fl-node end-no" id="fl-false">返回 false</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== State =====
+    let bed = [];
+    let n = 0;
+    let steps = [];
+    let curStep = -1;
+    let autoTimer = null;
+    let playing = false;
+
+    // ===== Load example =====
+    function loadEx(arr, num) {
+      document.getElementById('bedInput').value = arr.join(',');
+      document.getElementById('nInput').value = num;
+      resetViz();
+    }
+
+    // ===== Parse Input =====
+    function parseInput() {
+      const bStr = document.getElementById('bedInput').value.trim();
+      const nStr = document.getElementById('nInput').value.trim();
+      bed = bStr.split(',').map(s => parseInt(s.trim())).filter(v => v === 0 || v === 1);
+      n = parseInt(nStr) || 0;
+      if (bed.length === 0) { bed = [1,0,0,0,1]; n = 1; }
+    }
+
+    // ===== Generate Steps =====
+    function genSteps(b, needN) {
+      const arr = [];
+      const fb = [...b]; // working copy
+      let count = 0;
+
+      // Step: init
+      arr.push({
+        type: 'init',
+        fb: [...fb], count: 0, idx: -1,
+        codeLine: 1,
+        flowId: 'fl-init',
+        info: `初始化 <span class="hl-b">count = 0</span>，准备从左到右扫描花坛 [${fb.join(', ')}]，需要种 <span class="hl-r">${needN}</span> 朵花。`
+      });
+
+      let earlyReturn = false;
+
+      for (let i = 0; i < fb.length; i++) {
+        if (fb[i] === 1) {
+          // Already has flower, skip
+          arr.push({
+            type: 'has-flower',
+            fb: [...fb], count, idx: i,
+            codeLine: 3,
+            flowId: 'fl-empty',
+            info: `位置 <span class="hl-y">i=${i}</span>：已有花 🌷，<span class="hl-r">跳过</span>。`
+          });
+          continue;
+        }
+
+        // fb[i] === 0, check neighbors
+        const leftOk = i === 0 || fb[i - 1] === 0;
+        const rightOk = i === fb.length - 1 || fb[i + 1] === 0;
+
+        if (leftOk && rightOk) {
+          // Can plant
+          fb[i] = 1;
+          count++;
+
+          const leftReason = i === 0 ? '左边界(无邻居)' : `bed[${i-1}]=0`;
+          const rightReason = i === fb.length - 1 ? '右边界(无邻居)' : `bed[${i+1}]=0`;
+
+          arr.push({
+            type: 'plant',
+            fb: [...fb], count, idx: i,
+            leftOk: true, rightOk: true,
+            leftReason, rightReason,
+            codeLine: 7,
+            flowId: 'fl-plant',
+            info: `位置 <span class="hl-y">i=${i}</span>：空地，左 ✅ ${leftReason}，右 ✅ ${rightReason} → <span class="hl-g">种花！🌸 count=${count}</span>`
+          });
+
+          if (count >= needN) {
+            arr.push({
+              type: 'early-return',
+              fb: [...fb], count, idx: i, result: true,
+              codeLine: 9,
+              flowId: 'fl-true',
+              info: `<span class="hl-g">count=${count} ≥ n=${needN}，提前返回 true！🎉</span> 已经种够了！`
+            });
+            earlyReturn = true;
+            break;
+          }
+        } else {
+          // Cannot plant
+          const leftReason = leftOk ? (i === 0 ? '左边界 ✅' : `bed[${i-1}]=0 ✅`) : `bed[${i-1}]=1 ❌`;
+          const rightReason = rightOk ? (i === fb.length - 1 ? '右边界 ✅' : `bed[${i+1}]=0 ✅`) : `bed[${i+1}]=1 ❌`;
+
+          arr.push({
+            type: 'cannot-plant',
+            fb: [...fb], count, idx: i,
+            leftOk, rightOk,
+            leftReason, rightReason,
+            codeLine: 6,
+            flowId: 'fl-skip',
+            info: `位置 <span class="hl-y">i=${i}</span>：空地，但左 ${leftOk ? '✅' : '❌'} ${leftReason}，右 ${rightOk ? '✅' : '❌'} ${rightReason} → <span class="hl-r">不能种</span>`
+          });
+        }
+      }
+
+      if (!earlyReturn) {
+        const result = count >= needN;
+        arr.push({
+          type: 'final',
+          fb: [...fb], count, idx: -1, result,
+          codeLine: 13,
+          flowId: result ? 'fl-true2' : 'fl-false',
+          info: `遍历结束，<span class="hl-b">count=${count}</span> ${result ? '≥' : '<'} <span class="hl-r">n=${needN}</span> → ${result ? '<span class="hl-g">返回 true ✅</span>' : '<span class="hl-r">返回 false ❌</span>'}`
+        });
+      }
+
+      return arr;
+    }
+
+    // ===== Render Flowerbed =====
+    function renderBed(fb, checkIdx, plantedSet) {
+      const wrap = document.getElementById('flowerbed');
+      wrap.innerHTML = '';
+      for (let i = 0; i < fb.length; i++) {
+        const plot = document.createElement('div');
+        const isFlower = fb[i] === 1;
+        const justPlanted = plantedSet && plantedSet.has(i);
+
+        plot.className = 'plot' + (isFlower ? ' flower' : ' empty');
+        plot.id = `plot-${i}`;
+
+        let emoji;
+        if (isFlower) {
+          emoji = justPlanted ? '🌸' : '🌷';
+        } else {
+          emoji = '🟫';
+        }
+
+        plot.innerHTML = `
+          <div class="idx">[ ${i} ]</div>
+          <span class="emoji">${emoji}</span>
+          <div class="val">${fb[i]}</div>
+          <div class="planted-badge" id="badge-${i}">NEW!</div>
+        `;
+        wrap.appendChild(plot);
+      }
+    }
+
+    // ===== Render Step =====
+    function renderStep(idx) {
+      if (idx < 0 || idx >= steps.length) return;
+      const step = steps[idx];
+
+      // Clear highlights
+      document.querySelectorAll('.code-line').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.fl-node').forEach(el => el.classList.remove('active-fl'));
+      document.querySelectorAll('.plot').forEach(el => {
+        el.classList.remove('checking', 'just-planted', 'skip');
+      });
+
+      // Code highlight
+      const cl = document.querySelector(`.code-line[data-line="${step.codeLine}"]`);
+      if (cl) cl.classList.add('active');
+
+      // Flow highlight
+      const fn = document.getElementById(step.flowId);
+      if (fn) fn.classList.add('active-fl');
+
+      // Info
+      document.getElementById('stepInfo').innerHTML = `<strong>步骤 ${idx + 1}/${steps.length}：</strong>${step.info}`;
+
+      // Counters
+      document.getElementById('plantedCount').textContent = step.count;
+      document.getElementById('needCount').textContent = n;
+
+      // Collect all planted positions up to this step
+      const plantedSet = new Set();
+      const originalBed = bed;
+      for (let s = 0; s <= idx; s++) {
+        if (steps[s].type === 'plant') {
+          plantedSet.add(steps[s].idx);
+        }
+      }
+
+      // Render flowerbed
+      renderBed(step.fb, step.idx, plantedSet);
+
+      // Highlight current plot
+      const nbCheck = document.getElementById('neighborCheck');
+      nbCheck.innerHTML = '';
+
+      if (step.idx >= 0 && step.idx < step.fb.length) {
+        const plot = document.getElementById(`plot-${step.idx}`);
+        if (plot) {
+          if (step.type === 'plant') {
+            plot.classList.add('just-planted');
+            const badge = document.getElementById(`badge-${step.idx}`);
+            if (badge) badge.classList.add('show');
+          } else if (step.type === 'cannot-plant') {
+            plot.classList.add('skip');
+          } else if (step.type === 'has-flower') {
+            plot.classList.add('checking');
+          } else {
+            plot.classList.add('checking');
+          }
+        }
+
+        // Neighbor check display
+        if (step.type === 'plant' || step.type === 'cannot-plant') {
+          nbCheck.innerHTML = `
+            <span class="nb-item ${step.leftOk ? 'nb-ok' : 'nb-bad'}">左: ${step.leftReason}</span>
+            <span class="nb-item ${step.rightOk ? 'nb-ok' : 'nb-bad'}">右: ${step.rightReason}</span>
+            <span class="nb-item ${(step.leftOk && step.rightOk) ? 'nb-ok' : 'nb-bad'}">
+              结果: ${(step.leftOk && step.rightOk) ? '✅ 可以种花' : '❌ 不能种花'}
+            </span>
+          `;
+        }
+      }
+
+      // Result banner
+      const banner = document.getElementById('resultBanner');
+      banner.className = 'result-banner';
+      banner.style.display = 'none';
+
+      if (step.type === 'early-return' || step.type === 'final') {
+        banner.style.display = 'block';
+        if (step.result) {
+          banner.className = 'result-banner pass';
+          banner.innerHTML = `✅ 返回 true — 可以种下 ${n} 朵花！（已种 ${step.count} 朵）`;
+        } else {
+          banner.className = 'result-banner fail';
+          banner.innerHTML = `❌ 返回 false — 无法种下 ${n} 朵花（最多种 ${step.count} 朵）`;
+        }
+      }
+    }
+
+    // ===== Controls =====
+    function initViz() {
+      parseInput();
+      steps = genSteps(bed, n);
+      curStep = -1;
+      renderBed(bed, -1, null);
+      document.getElementById('plantedCount').textContent = '0';
+      document.getElementById('needCount').textContent = n;
+      document.getElementById('neighborCheck').innerHTML = '';
+      document.getElementById('stepInfo').innerHTML = `点击 <span class="hl-g">自动演示</span> 或 <span class="hl-b">单步</span> 开始。flowerbed=[${bed.join(',')}], n=${n}`;
+      document.getElementById('resultBanner').style.display = 'none';
+      document.querySelectorAll('.code-line').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.fl-node').forEach(el => el.classList.remove('active-fl'));
+    }
+
+    function stepForward() {
+      if (curStep === -1 && steps.length === 0) initViz();
+      if (curStep < steps.length - 1) {
+        curStep++;
+        renderStep(curStep);
+      }
+    }
+
+    function getDelay() {
+      const v = document.getElementById('speedRange').value;
+      return 1700 - v * 150;
+    }
+
+    function runAuto() {
+      if (playing) {
+        clearTimeout(autoTimer);
+        playing = false;
+        document.querySelector('.btn-run').textContent = '▶ 自动演示';
+        return;
+      }
+
+      if (curStep === -1 || curStep >= steps.length - 1) initViz();
+      playing = true;
+      document.querySelector('.btn-run').textContent = '⏸ 暂停';
+
+      function tick() {
+        if (curStep < steps.length - 1) {
+          curStep++;
+          renderStep(curStep);
+          autoTimer = setTimeout(tick, getDelay());
+        } else {
+          playing = false;
+          document.querySelector('.btn-run').textContent = '▶ 自动演示';
+        }
+      }
+      tick();
+    }
+
+    function resetViz() {
+      clearTimeout(autoTimer);
+      playing = false;
+      document.querySelector('.btn-run').textContent = '▶ 自动演示';
+      initViz();
+    }
+
+    // Init
+    window.addEventListener('DOMContentLoaded', initViz);
+  </script>
+</body>
+</html>
